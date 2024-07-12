@@ -1,0 +1,152 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# 
+# Module: hamqsicreatebroker
+#  
+# Args:
+#   Arguments are the same as for mqsicreatebroker
+#
+# Description:
+#   This script creates an MQSI broker so that it can run 
+#   in an HA cluster.
+#
+#   A broker relies on a database, which is run within 
+#   a database instance. This script assumes that the 
+#   database instance name is the same as the userid
+#   under which the instance is run.
+#
+#   Runs as root and uses su when creating broker
+# 
+#
+
+
+
+# Must be run as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Save the supplied arguments - we'll need it below
+ORIG_ARGS=$*
+
+# Parse the args for $BROKER, $QM, $DBINST & $MQUSER
+BROKER=$1
+
+if [ `echo $BROKER | grep '\-' | wc -l` == 1  ]
+then
+   echo "hamqsicreatebroker: ERROR! No Broker name supplied"
+   echo "hamqsicreatebroker: Specify parameters as with mqsicreatebroker"
+   exit 1
+fi
+
+# Parse the remaining args to find the QM, DBINST and MQUSER
+shift # to get past the broker name argument
+while getopts :i:q:n: arguments
+do
+  case $arguments in
+    i) MQUSER=$OPTARG;;
+    q) QM=$OPTARG;;
+    n) DBINST=$OPTARG;;
+    :) echo "Missing argument to $OPTARG switch";;
+    \?) shift;; # ignore other (valid) switch and shift past its argument
+  esac
+done
+
+# Test that we have QM, DBINST and MQUSER args set
+if [ -z "$QM" ]
+then
+   echo "hamqsicreatebroker: ERROR! No queue manager name supplied"
+   echo "hamqsicreatebroker: Specify parameters as with mqsicreatebroker"
+   exit 1
+fi
+
+if [ -z "$DBINST" ]                                                   
+then                                                              
+   echo "hamqsicreatebroker: ERROR! No database instance name supplied"
+   echo "hamqsicreatebroker: Specify parameters as with mqsicreatebroker"
+   exit 1                                                          
+fi                                                                
+
+if [ -z "$MQUSER" ]
+then
+   echo "hamqsicreatebroker: ERROR! No userid supplied"
+   echo "hamqsicreatebroker: Specify parameters as with mqsicreatebroker"
+   exit 1
+fi
+
+# Create the broker
+su - $MQUSER -c "mqsicreatebroker $ORIG_ARGS"
+if [ $? -ne "0" ]
+then
+  echo "hamqsicreatebroker: Error from mqsicreatebroker command"
+  exit 1
+fi
+
+# Now find out where the datapath of the QM is.
+DATAPATH=`./hamqsi_qm_datapath $QM`
+echo "Broker directories will be moved to be under $DATAPATH"
+
+# The components/$BROKER and registry/$BROKER directories for this broker
+# will be moved to the QM data directory, which is on shared disk. Symbolic 
+# links are then created.
+#
+curdir=`pwd`
+
+cd /var/mqsi/components
+echo "hamqsicreatebroker: Moving components/$BROKER directory to $QM/data directory"
+if [ ! -d $DATAPATH/components ]
+then
+  mkdir $DATAPATH/components
+fi
+cp -Rp $BROKER $DATAPATH/components
+rm -fr $BROKER
+ln -fs $DATAPATH/components/$BROKER $BROKER
+
+cd /var/mqsi/registry  
+echo "hamqsicreatebroker: Moving registry/$BROKER directory to $QM/data directory"
+if [ ! -d $DATAPATH/registry ]
+then
+  mkdir $DATAPATH/registry
+fi
+cp -Rp $BROKER $DATAPATH/registry
+rm -fr $BROKER
+ln -fs $DATAPATH/registry/$BROKER $BROKER
+cd $curdir
+
+
+# Create an Application Monitor
+# HACMP/ES does not seem to support passing parameters to application
+# monitoring scripts. So we need to create a unique monitor script for
+# the combination of broker, qm and dbinst. The auto-created script
+# is called /MQHA/bin/hamqsi_applmon.$BROKER and it is this script which 
+# is entered in the HACMP/ES configuration panels.
+#
+apmon=/MQHA/bin/hamqsi_applmon.$BROKER
+cat > $apmon << EOF
+#!/bin/ksh
+/MQHA/bin/hamqsi_monitor_broker_as $BROKER $QM $DBINST $MQUSER
+EOF
+chmod +x $apmon
+
+
+echo "hamqsicreatebroker:"
+echo "\t You need to run hamqsiaddbrokerstandby $BROKER $QM $MQUSER on standby nodes"
+
+
+exit 0

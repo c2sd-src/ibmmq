@@ -1,0 +1,128 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module: hamqsideletecfgmgr
+#
+# Args:
+#   configmgr  = name of configmgr to delete
+#   mquser  = userid under which configmgr service runs
+#
+# Description:
+#   This script deletes a configmgr. It has to be run on the 
+#   node on which the configmgr is currently hosted. The script
+#   detects whether the configmgr is currently present or whether 
+#   this node is acting only as a standby. If the configmgr is 
+#   present it is deleted. If it is not present an error 
+#   message is generated.
+#
+#   The configmgr must be removed from HACMP control and stopped
+#   before calling this script.
+#
+#   Runs as root and uses su when deleting configmgr
+#
+#
+
+# Check running as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Parse the args for CFGMGR, MQUSER
+CFGMGR=$1
+MQUSER=$2
+
+if [ -z "$CFGMGR" ]           
+then                        
+  echo "hamqsideletecfgmgr: ERROR! No ConfigMgr supplied"
+  echo "   Usage: hamqsideletecfgmgr <BROKER> <MQUSER>"
+  exit 1                    
+fi                          
+                            
+if [ -z "$MQUSER" ]           
+then                        
+  echo "hamqsideletecfgmgr: ERROR! No userid supplied"
+  echo "   Usage: hamqsideletecfgmgr <BROKER> <MQUSER>"
+  exit 1                    
+fi                                                 
+
+# Work out whether the ConfigMgr is locally present
+# Try and cd to broker directory
+curdir=`pwd`
+cd /var/mqsi/components/$CFGMGR
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsideletecfgmgr: "
+  echo "\t ConfigMgr is not local"
+  echo "\t You should only run this script on the node which has the ConfigMgr"
+  exit 1
+fi
+cd $curdir
+
+# The components/$CFGMGR and registry/$CFGMGR directories for this configmgr
+# are mounted and are accessed by symlinks. Destroy the symlinks,
+# move the directories back to internal disk, clearing up the shared disk.
+echo "hamqsideletecfgmgr: Moving components/$CFGMGR and registry/$CFGMGR " \
+     "back from QM data directory"
+curdir=`pwd`
+
+# Handle the components/$CFGMGR directory
+cd /var/mqsi/components
+shareddir=`ls -e $CFGMGR | awk '{print $NF}' `
+if [ -z $shareddir ]
+then
+  echo "hamqsideletecfgmgr: Could not find path to components/$CFGMGR directory"
+  echo "hamqsideletecfgmgr: Please check parameters and directory structure"   
+  exit 1
+else
+  rm -f $CFGMGR               # delete the symlink
+  cp -Rp $shareddir $CFGMGR   # copy the dir from shared to internal
+  rm -fr $shareddir           # delete the shareddir
+fi
+
+# Handle the registry/$CFGMGR directory
+cd /var/mqsi/registry
+shareddir=`ls -e $CFGMGR | awk '{print $NF}' `
+if [ -z $shareddir ]
+then
+  echo "hamqsideletecfgmgr: Could not find path to registry/$CFGMGR directory"
+  echo "hamqsideletecfgmgr: Please check parameters and directory structure"   
+  exit 1
+else
+  rm -f $CFGMGR               # delete the symlink
+  cp -Rp $shareddir $CFGMGR   # copy the dir from shared to internal
+  rm -fr $shareddir           # delete the shareddir
+fi
+
+cd $curdir
+
+# Delete the configmgr
+su - $MQUSER -c "mqsideleteconfigmgr $CFGMGR"
+if [ $? -ne "0" ]
+then
+  echo "hamqsideletecfgmgr: Error from mqsideleteconfigmgr command"
+  exit 1
+fi
+
+#
+# Advise user that they can delete Application Monitor 
+#
+echo "hamqsideletecfgmgr: You could optionally delete /MQHA/bin/hamqsi_applmon.$CFGMGR"
+echo "hamqsideletecfgmgr: Completed"
+
+exit 0

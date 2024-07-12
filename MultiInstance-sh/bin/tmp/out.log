@@ -1,0 +1,264 @@
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 05. 28. (화) 18:03:46 KST MQSeries Message Channel Start
+WMWM6D.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+inactive is invoking. abnormal need status check
+SMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.B1)
+SMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.N1)
+WMEAI1D.WMWM6D.B1 CHANNEL is already running...
+WMEAI1D.WMWM6D.N1 CHANNEL is already running...
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.SMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 \t:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : SMEAI1D.WMWM6D.B1 \t:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 \t:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 \t:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 \t:  RUNNING
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 05. 28. (화) 18:04:40 KST MQSeries Message Channel Stop
+WMWM6D.SMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.SMEAI1D.B1 \t:  STOPPED
+Status Channel Name : WMWM6D.SMEAI1D.N1 \t:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.B1 \t:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.N1 \t:  STOPPED
+REQSTR CHANNEL STATUS
+Status Channel Name : SMEAI1D.WMWM6D.B1 \t:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 \t:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 \t:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 \t:  RUNNING
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 05. 28. (화) 18:04:55 KST MQSeries Message Channel Start
+WMWM6D.SMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+SMEAI1D.WMWM6D.B1 CHANNEL is already running...
+SMEAI1D.WMWM6D.N1 CHANNEL is already running...
+WMEAI1D.WMWM6D.B1 CHANNEL is already running...
+WMEAI1D.WMWM6D.N1 CHANNEL is already running...
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.SMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 \t:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : SMEAI1D.WMWM6D.B1 \t:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 \t:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 \t:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 \t:  RUNNING
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 05. 31. (금) 18:02:01 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 05. 31. (금) 18:02:12 KST MQSeries Message Channel Start
+WMWM6D.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+inactive is invoking. abnormal need status check
+SMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.B1)
+SMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.N1)
+WMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.B1)
+WMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.SMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 \t:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : SMEAI1D.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.N1 \t:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.N1 \t:  REQUESTING
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 17. (월) 11:06:41 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 17. (월) 11:07:03 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.B1)
+EAIBK3P.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.N1)
+SMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.B1)
+SMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.N1)
+WMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.B1)
+WMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 \t:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 \t:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : EAIBK3P.WMWM6D.N1 \t:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.N1 \t:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.N1 \t:  REQUESTING
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 17. (월) 13:25:58 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 17. (월) 13:26:27 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.B1)
+EAIBK3P.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.N1)
+SMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.B1)
+SMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.N1)
+WMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.B1)
+WMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 \t:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 \t:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 \t:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : EAIBK3P.WMWM6D.N1 \t:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.N1 \t:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.B1 \t:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.N1 \t:  REQUESTING

@@ -1,0 +1,121 @@
+#!/bin/ksh
+# Start script for ILink 
+
+cnt=$#
+USER_ID=`whoami`
+ILINKSERVERPORT=`cat ILinkServerStartUp.xml | grep '\<ListeningPort' | sed 's/[^0-9]//g'`
+if [ $cnt -eq 0 ];
+then
+  USER_HOME=${HOME}
+else
+  USER_HOME=$1
+fi
+
+. ${USER_HOME}/.profile
+
+cnt=`env | grep ILinkHome | grep -v grep | wc -l`
+
+if [ $cnt -eq 0 ];
+then
+  export ILinkHome=/mqm/data/mi/ilink
+  echo "ILinkHome path was not found in env"
+  echo "Now ILinkHome is ${ILinkHome}"
+fi
+
+# AIX
+cnt=`env | grep LIBPATH | grep -v grep | wc -l`
+
+if [ $cnt -eq 0 ];
+then
+  export LIBPATH=/usr/lib
+fi
+
+export LIBPATH=${ILinkHome}/lib:$LIBPATH
+
+# SUN
+cnt=`env | grep LD_LIBRARY_PATH | grep -v grep | wc -l`
+
+if [ $cnt -eq 0 ];
+then
+  export LB_LIBRARY_PATH=/usr/lib
+fi
+
+export LD_LIBRARY_PATH=${ILinkHome}/lib:$LD_LIBRARY_PATH
+
+# HP-UX
+cnt=`env | grep SHLIB_PATH | grep -v grep | wc -l`
+
+if [ $cnt -eq 0 ];
+then
+  export SHLIB_PATH=/usr/lib
+fi
+
+export SHLIB_PATH=${ILinkHome}/lib:$SHLIB_PATH
+
+#export ILinkHome=/home/
+
+cd $ILinkHome
+
+#( ./ILinkServer ${@+"$@"} > /dev/null 2>&1 &) &
+
+# CHECK ILinkServer process
+cnt=`ps -ef  | grep ${USER_ID} |grep ILinkServer | grep ${LOGNAME} | grep -v grep | wc -l`
+
+if [ $cnt -ne 0 ];
+then
+  echo "There are already ILinkServer process exist."
+  echo "Exit script..."
+else
+  echo "Now ILinkServer starting..."
+#( ./ILinkServer -d )&
+( ${ILinkHome}/ILinkServer -d )&
+fi
+
+i=0
+j=0
+cnt=0
+
+set -A QMGR_LIST `ls -p ${ILinkHome}/managers | grep "/" | sed 's/\///g'`
+
+QMGR_CNT=${#QMGR_LIST[*]}
+
+while [ $i -lt 30 ]
+do
+  proc_cnt=`ps -ef | grep ${USER_ID} | grep ILinkQManager | grep -v grep | wc -l`
+
+  if [ $proc_cnt -ge ${QMGR_CNT} ];
+  then
+    i=30
+  else
+    echo "ILink Queue Manager starting..."
+    i=`expr $i + 1`
+    sleep 1
+  fi
+done
+
+i=0
+
+while [ $i -lt ${QMGR_CNT} ]
+do
+  proc_cnt=`ps -ef | grep ${USER_ID} |grep ILinkQManager | grep -v grep | grep ${QMGR_LIST[i]} | wc -l`
+  if [ $proc_cnt -eq 0 ];
+  then
+    echo "start m ${QMGR_LIST[i]}
+    exit" | ILinkCon localhost ${ILINKSERVERPORT}
+  fi
+
+  i=`expr $i + 1`
+done
+
+sleep 1
+
+proc_cnt=`ps -ef | grep ${USER_ID}  | grep ILinkQManager | grep -v grep | wc -l`
+
+if [ $proc_cnt -lt ${QMGR_CNT} ];
+then
+  echo "ILink Queue Manager start all failed..."
+  echo "Check Queue Manager please..."
+else
+  echo "ILink Queue Manager start all success!"
+fi
+

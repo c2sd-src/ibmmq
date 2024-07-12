@@ -1,0 +1,119 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module:
+#   hamqsi_start_cfgmgr
+#
+# Args:  
+#   CFGMGR = name of Configuration Manager to start
+#
+# Description:
+#   This script attempts to start the Config Manager
+#
+#   It should be run as the userid under which the config manager service 
+#   runs.
+#
+
+CFGMGR=$1
+
+if [ -z "$CFGMGR" ]
+then
+  echo "hamqsi_start_cfgmgr: ERROR! No Config Manager name supplied"
+  echo "   Usage: hamqsi_start_cfgmgr <CFGMGR>"
+  exit 1
+fi
+
+
+# Ensure that the config manager is not already running. In this test
+# we look for any config manager-related processes, which may have
+# been left around after a previous failure. Any that remain
+# must now be terminated. This is a brutal means of mopping 
+# up config manager processes.
+# We stop the processes in the following order:
+#   bipservice       - first so it cannot issue restarts
+#   biconfigmgr      - last 
+#
+echo "hamqsi_start_cfgmgr: Ensure Config Manager not already running"
+for process in bipservice bipconfigmgr
+do
+  # Output of kill redirected to /dev/null in case no processes
+  ps -ef | grep "$process $CFGMGR" | grep -v grep | \
+     awk '{print $2}'| xargs kill -9 > /dev/null 2>&1
+done
+
+
+# Start the Config Manager
+echo "hamqsi_start_cfgmgr: Start Config Manager"
+mqsistart $CFGMGR > /dev/null 2>&1
+if [ $? -ne "0" ]
+then 
+  echo "hamqsi_start_cfgmgr: Bad result from mqsistart Config Manager"
+  exit 1
+fi
+
+# Check to see if the config manager service has started. This loop 
+# uses a fixed online timeout of approx. 10 seconds.
+TIMED_OUT=yes
+i=0
+while [ $i -lt 10 ]
+do
+  # Check for config manager start. We look for bipservice and 
+  # bipuns to be running.
+  # Look to see whether bipservice is running
+  cnt=`ps -ef | grep "bipservice $CFGMGR" | grep -v grep | wc -l`
+  if [ $cnt -gt 0 ]
+  then
+    # Look to see whether bipconfigmgr is running
+    cnt=`ps -ef | grep "bipconfigmgr $CFGMGR" | grep -v grep | wc -l`
+    if [ $cnt -gt 0 ]
+    then
+      # config manager is online
+      echo "hamqsi_start_cfgmgr: Config Manager is running"
+      TIMED_OUT=no
+      break  # out of timing loop
+    fi
+  fi
+  # Manage the loop counter
+  i=`expr $i + 1`
+  sleep 1
+done
+
+# Report error if config manager failed to start in time
+if [ ${TIMED_OUT} = "yes" ]
+then 
+  echo "hamqsi_start_cfgmgr: config manager service failed to start"
+  exit 1
+else
+  # config manager was started and came online within timeout.
+  # Launch post-online script in background. We are running
+  # as the config manager userid and run the script as this userid.
+  # This is always done in the background so we don't delay the
+  # HA methods, which need to stay responsive. A synchronous
+  # call to the user method might delay (indefinitely) the
+  # completion of our start_uns method, which would upset
+  # other actions being taken by the cluster.
+
+  # Is there an executable method for us to run?
+  if [ -x /MQHA/bin/rc.mqsi ]
+  then
+    echo "hamqsi_start_cfgmgr: run post_online script for Config Manager"
+    /MQHA/bin/rc.mqsi Config Manager post_online &
+    # The exit code from online script is deliberately ignored
+  fi
+fi
+
+
+exit 0

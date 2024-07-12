@@ -1,0 +1,106 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+#
+# Module:
+#   hamqsi_start_cfgmgr_as
+#
+# Args:
+#   qm = name of config manager queue manager
+#   mquser = user account under which QM and Config Manager are run
+#
+# Description:
+#   Starting an MQSI UNS requires the following services:
+#   (1) The MQSeries Queue Manager which supports the Config Manager
+#   (2) The MQSI Configuration Manager service (bipcopnfigmgr)
+#   This script provides a single source to initiate the required 
+#   services in sequence. 
+#  
+#   Queue Manager:
+#   This script uses the hamqm_start_su script supplied by MQSeries
+#   SupportPac MC91: ,to start the MQSeries Queue Manager. 
+#   The hamqm_start_su script ensures that the QM is fully 
+#   stopped before starting it.
+#  
+#
+#   The hamqsi_start_cfgmgr_as script should be run as root.
+#
+
+
+# Check running as root
+#if [ `id -u`  -ne 0 ]
+#then
+#  echo "Must be running as root"
+#  exit 1
+#fi
+
+ 
+QM=$1
+MQUSER=$2
+CFGMGR=$3
+
+# Check all parameters exist
+
+if [ -z "$QM" ]
+then
+  echo "hamqsi_start_cfgmgr_as: ERROR! No queue manager name supplied"
+  echo "   Usage: hamqsi_start_cfgmgr_as <QM> <MQUSER> <CFGMGR>"
+  exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+  echo "hamqsi_start_cfgmgr_as: ERROR! No Userid supplied"
+  echo "   Usage: hamqsi_start_cfgmgr_as <QM> <MQUSER> <CFGMGR>"
+  exit 1
+fi
+
+if [ -z "$CFGMGR" ]
+then
+  echo "hamqsi_start_cfgmgr_as: ERROR! No ConfigMgr Name supplied"
+  echo "   Usage: hamqsi_start_cfgmgr_as <QM> <MQUSER> <CFGMGR>"
+  exit 1
+fi
+
+
+
+# ------------------------------------------------------------------- 
+# Start the Queue Manager by using the MC63 start script
+#
+echo "hamqsi_start_cfgmgr_as: Start Queue manager " $QM 
+su $MQUSER -c "/MQHA/bin/hamqm_start_su $QM"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsi_start_cfgmgr_as: Could not start the queue manager"
+  exit $rc
+fi
+
+
+# ------------------------------------------------------------------- 
+# Start the ConfigMgr
+#
+# Ensure that the UNS is not already running and start it.
+su - $MQUSER -c "/MQHA/bin/hamqsi_start_cfgmgr $CFGMGR"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsi_start_cfgmgr_as: Could not start the Config Manager"
+  exit $rc
+fi
+
+exit $rc
+

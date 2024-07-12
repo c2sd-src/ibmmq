@@ -1,0 +1,603 @@
+\nMTE Control Center Agent stopping.
+\nHQ6P Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:15:44 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+\nMTE Adapter stopping...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Stop  MEA Adapter all list                #
+####################################################
+2024. 06. 18. (화) 16:15:46 KST MEA Adapter Stop all
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is stopping...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is stopped.
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is stopping...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is stopped.
+WM_SS_IF_MNTR_SDR_DBBT MEA is stopping...
+WM_SS_IF_MNTR_SDR_DBBT MEA is stopped.
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: STOPPED 
+\nHQ6P Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:17:06 KST MQSeries Message Channel Start
+HQ6P.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.BT CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.BT)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.NB CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.NB)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.B1)
+EAIBK3P.HQ6P.BT CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.BT)
+EAIBK3P.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.N1)
+EAIBK3P.HQ6P.NB CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.NB)
+SMEAI1D.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.B1)
+SMEAI1D.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : HQ6P.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.BT 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.NB 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.HQ6P.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.HQ6P.BT 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.N1 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.NB 	:  REQUESTING
+Status Channel Name : SMEAI1D.HQ6P.B1 	:  REQUESTING
+Status Channel Name : SMEAI1D.HQ6P.N1 	:  REQUESTING
+\nMTE Adapter starting...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Start MEA Adapter all list                #
+####################################################
+2024. 06. 18. (화) 16:17:11 KST MEA Adapter Start ALL
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_SS_IF_MNTR_SDR_DBBT MEA is invoking...
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: RUNNING 
+\nMTE Control Center Agent Starting.
+\nMTE Control Center Agent stopping.
+\nHQ6P Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:44:38 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+\nMTE Adapter stopping...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Stop  MEA Adapter all list                #
+####################################################
+2024. 06. 18. (화) 16:44:40 KST MEA Adapter Stop all
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is stopping...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is stopped.
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is stopping...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is stopped.
+WM_SS_IF_MNTR_SDR_DBBT MEA is stopping...
+WM_SS_IF_MNTR_SDR_DBBT MEA is stopped.
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: STOPPED 
+\nHQ6P Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:45:09 KST MQSeries Message Channel Start
+HQ6P.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.BT CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.BT)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.NB CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.NB)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.B1)
+EAIBK3P.HQ6P.BT CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.BT)
+EAIBK3P.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.N1)
+EAIBK3P.HQ6P.NB CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.NB)
+SMEAI1D.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.B1)
+SMEAI1D.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : HQ6P.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.BT 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.NB 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.HQ6P.B1 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.BT 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.N1 	: 
+Status Channel Name : EAIBK3P.HQ6P.NB 	: 
+Status Channel Name : SMEAI1D.HQ6P.B1 	:  REQUESTING
+Status Channel Name : SMEAI1D.HQ6P.N1 	:  REQUESTING
+\nMTE Adapter starting...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Start MEA Adapter all list                #
+####################################################
+2024. 06. 18. (화) 16:45:14 KST MEA Adapter Start ALL
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_SS_IF_MNTR_SDR_DBBT MEA is invoking...
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: RUNNING 
+\nMTE Control Center Agent Starting.
+
+MTE Control Center Agent stopping.
+
+HQ6P Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:51:20 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+
+MTE Adapter stopping...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Stop  MEA Adapter all list                #
+####################################################
+2024. 06. 18. (화) 16:51:22 KST MEA Adapter Stop all
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is stopping...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is stopped.
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is stopping...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is stopped.
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is stopping...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is stopped.
+WM_SS_IF_MNTR_SDR_DBBT MEA is stopping...
+WM_SS_IF_MNTR_SDR_DBBT MEA is stopped.
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: STOPPED 
+
+HQ6P Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:51:55 KST MQSeries Message Channel Start
+HQ6P.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.BT CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.BT)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.NB CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.NB)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.B1)
+EAIBK3P.HQ6P.BT CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.BT)
+EAIBK3P.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.N1)
+EAIBK3P.HQ6P.NB CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.NB)
+SMEAI1D.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.B1)
+SMEAI1D.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : HQ6P.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.BT 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.NB 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.HQ6P.B1 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.BT 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.N1 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.NB 	:  REQUESTING
+Status Channel Name : SMEAI1D.HQ6P.B1 	:  REQUESTING
+Status Channel Name : SMEAI1D.HQ6P.N1 	:  REQUESTING
+
+MTE Adapter starting...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Start MEA Adapter all list                #
+####################################################
+2024. 06. 18. (화) 16:52:00 KST MEA Adapter Start ALL
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_SS_IF_MNTR_SDR_DBBT MEA is invoking...
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: RUNNING 
+
+MTE Control Center Agent Starting.
+
+HQ6P Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 25. (화) 14:39:29 KST MQSeries Message Channel Start
+HQ6P.EAIBK3P.B1 CHANNEL is already running...
+HQ6P.EAIBK3P.BT CHANNEL is already running...
+HQ6P.EAIBK3P.N1 CHANNEL is already running...
+HQ6P.EAIBK3P.NB CHANNEL is already running...
+HQ6P.SMEAI1D.B1 CHANNEL is already running...
+HQ6P.SMEAI1D.N1 CHANNEL is already running...
+EAIBK3P.HQ6P.B1 CHANNEL is already running...
+EAIBK3P.HQ6P.BT CHANNEL is already running...
+EAIBK3P.HQ6P.N1 CHANNEL is already running...
+EAIBK3P.HQ6P.NB CHANNEL is already running...
+SMEAI1D.HQ6P.B1 CHANNEL is already running...
+SMEAI1D.HQ6P.N1 CHANNEL is already running...
+SENDER CHANNEL STATUS
+Status Channel Name : HQ6P.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.BT 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.NB 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.HQ6P.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.HQ6P.BT 	:  RUNNING
+Status Channel Name : EAIBK3P.HQ6P.N1 	:  RUNNING
+Status Channel Name : EAIBK3P.HQ6P.NB 	:  RUNNING
+Status Channel Name : SMEAI1D.HQ6P.B1 	:  RUNNING
+Status Channel Name : SMEAI1D.HQ6P.N1 	:  RUNNING
+
+MTE Adapter starting...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Start MEA Adapter all list                #
+####################################################
+2024. 06. 25. (화) 14:39:32 KST MEA Adapter Start ALL
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_SS_IF_MNTR_SDR_DBBT MEA is invoking...
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: RUNNING 
+
+MTE Control Center Agent Starting.
+
+MTE Control Center Agent stopping.
+
+HQ6P Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 28. (금) 15:21:46 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+
+MTE Adapter stopping...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Stop  MEA Adapter all list                #
+####################################################
+2024. 06. 28. (금) 15:21:48 KST MEA Adapter Stop all
+ MEA is already stopped.
+ MEA is already stopped.
+ MEA is already stopped.
+ MEA is already stopped.
+ MEA is already stopped.
+ MEA is already stopped.
+ MEA is already stopped.
+ MEA is already stopped.
+ MEA is already stopped.
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: STOPPED 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: STOPPED 
+
+HQ6P Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 28. (금) 15:22:09 KST MQSeries Message Channel Start
+HQ6P.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.BT CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.BT)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+HQ6P.EAIBK3P.NB CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.EAIBK3P.NB)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+HQ6P.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(HQ6P.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.B1)
+EAIBK3P.HQ6P.BT CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.BT)
+EAIBK3P.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.N1)
+EAIBK3P.HQ6P.NB CHANEEL is invoking...
+     1 : start chl(EAIBK3P.HQ6P.NB)
+SMEAI1D.HQ6P.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.B1)
+SMEAI1D.HQ6P.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.HQ6P.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : HQ6P.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.BT 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : HQ6P.EAIBK3P.NB 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : HQ6P.SMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.HQ6P.B1 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.BT 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.N1 	:  REQUESTING
+Status Channel Name : EAIBK3P.HQ6P.NB 	:  REQUESTING
+Status Channel Name : SMEAI1D.HQ6P.B1 	:  REQUESTING
+Status Channel Name : SMEAI1D.HQ6P.N1 	:  REQUESTING
+
+MTE Adapter starting...
+####################################################
+#         MTE EAI Adapter Operation Tool           #
+#     Copyright MOCOMSYS Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#        Start MEA Adapter all list                #
+####################################################
+2024. 06. 28. (금) 15:22:14 KST MEA Adapter Start ALL
+WM_WM_BZETCIN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASNR_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCASN_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_DCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_WM_STKKY_HQ_DBOT_WM1 MEA is invoking...
+WM_WM_TCSHP_OR_DBOT_WM1 MEA is invoking...
+WM_SS_IF_MNTR_SDR_DBBT MEA is invoking...
+Check MEA log: /MQHA/mte/adapter/log/mea.log
+MEA STATUS
+Status MEA Name : WM_WM_BZETCIN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNETCOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_BZRTNGDOUT_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASNR_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCASN_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_DCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_STKKY_HQ_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_WM_TCSHP_OR_DBOT_WM1 	: RUNNING 
+Status MEA Name : WM_SS_IF_MNTR_SDR_DBBT 	: RUNNING 
+
+MTE Control Center Agent Starting.

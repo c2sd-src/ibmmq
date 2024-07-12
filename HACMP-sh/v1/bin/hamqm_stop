@@ -1,0 +1,21 @@
+#!/bin/ksh
+# @(#) public/hacmp/hamqm_stop, supportpacs, MQHA          1.2  00/11/06 16:58:23
+#
+# (C) Copyright IBM Corporation 2000
+#
+# MC63: MQSeries for AIX - Implementing with HACMP
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   Because HACMP runs scripts with root authority, and MQSeries prefers
+#   to be managed by the mqm userid, we've got here a simple wrapper
+#   which will switch to the correct account before running the real
+#   command.
+
+su mqm -c /MQHA/bin/hamqm_stop_su $*

@@ -1,0 +1,138 @@
+#!/bin/ksh
+# @(#) public/hacmp/halinkmqm, supportpacs, MQHA          1.6  07/12/11 08:55:40
+#
+# (C) Copyright IBM Corporation 2000, 2008
+#
+# MC63: WebSphere MQ for AIX - Implementing with HACMP
+# MC91: High Available for WebSphere MQ on Unix platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   halinkmqm - relink a QM tree so that it works for an HA environment
+#
+# This script is automatically run by the hacrtmqm script that
+# has been run to create the QM on the node with the disks.
+#
+# You must run halinkmqm on all OTHER nodes that may host the
+# QMGR. Don't run it again on the node which already has
+# the QMGR.
+#
+# Args:
+#       $1: Qmgr name
+#       $2: Mangled qmgr directory name -- may or may not be the same as qmgr
+#       $3: Shared Prefix               -- e.g. /MQHA/<qmgr>/data
+#
+if [ `whoami` != "mqm" ]
+then
+  echo "Need to be running as mqm"
+  exit 1
+fi
+
+if [ $# -ne 3 ]
+then
+  echo "Usage: halinkmqm QMgrName QMgrDataDirSubdirectory QMgrDataDirPrefix"
+  echo "   eg  halinkmqm ha.csq1 ha!csq1 /MQHA/ha.csq1/data"
+  exit 1
+fi
+	
+# Make sure others can read the directories we're about to create
+umask 022
+
+# Variables pointing to the original directory trees and the local IPC versions
+ipcbase="/var/mqm/ipc/$2"
+ipcorig="$3/qmgrs/$2"
+
+# Create the IPC directory (which will quite possibly already exist)
+# And then create the QMgr-specific subdirectory (which shouldn't)
+mkdir /var/mqm/ipc >/dev/null 2>&1
+chmod 775 /var/mqm/ipc
+
+mkdir $ipcbase
+mkdir $ipcbase/@ipcc
+chmod 775 $ipcbase $ipcbase/@ipcc
+mkdir $ipcbase/@qmpersist
+chmod 775 $ipcbase $ipcbase/@qmpersist
+mkdir $ipcbase/@app
+chmod 775 $ipcbase $ipcbase/@app
+
+# The link from /var/mqm/qmgrs is not necessary, but some programs
+# may assume a default path to the queue manager so we'll create it anyway
+ln -fs $3/qmgrs/$2 /var/mqm/qmgrs/$2
+
+
+# The /var/mqm/ipc directory is associated with a machine, not
+# a queue manager, so it is never failed over to a standby node.
+#
+# We need to create the ipc subdirs and set permissions on them.
+first_time="yes"
+cd $ipcbase
+for topdir in @ipcc @qmpersist @app
+do
+  for subdir in esem isem msem shmem spipe
+  do
+    if [ $first_time = "yes" ]
+    then
+      # This builds the IPC directories at the qmgr level
+      mkdir  $subdir
+      chown mqm:mqm $subdir
+      chmod 775 $subdir
+    fi
+    # And these are the child directories for various subpools
+    mkdir  $topdir/$subdir
+    chown mqm:mqm $topdir/$subdir
+    chmod 775 $topdir/$subdir
+  done
+  first_time="NO"
+done
+
+# The qmgrlocl subdirectory first appeared in WMQ V7
+mkdir qmgrlocl
+chown mqm:mqm qmgrlocl
+chmod 775 qmgrlocl
+
+if [ -r $3/qmgrs/$2/qm.ini ]
+then
+  # We're running on the master node that owns the queue manager
+  # so we will create symlinks back to /var/mqm/ipc subdirs
+  for topdir in @ipcc @qmpersist @app
+  do
+    for subdir in esem isem msem shmem spipe
+    do
+      rm -fr $ipcorig/$subdir
+      rm -fr $ipcorig/$topdir/$subdir
+      ln -fs $ipcbase/$subdir       $ipcorig/$subdir
+      ln -fs $ipcbase/$topdir/$subdir $ipcorig/$topdir/$subdir
+    done
+  done
+  rm -rf $ipcorig/qmgrlocl
+  ln -fs $ipcbase/qmgrlocl $ipcorig/qmgrlocl
+else
+ # We're running on a standby node, so all we have to do is to
+ # update the config file that tells us where the queue manager lives
+ cat >> /var/mqm/mqs.ini <<EOF
+QueueManager:
+   Name=$1
+   Prefix=$3
+   Directory=$2
+EOF
+fi
+
+# HACMP/ES does not seem to support passing parameters to application
+# monitoring scripts. So we need to create a unique monitor script for
+# each queue manager. And as we also need to switch userids from root
+# to mqm, the wrapper technique works quite well. The auto-created script
+# is called /MQHA/bin/hamqm_applmon.<qmgr name> and it is this script
+# which is entered in the HACMP/ES configuration panels.
+
+apmon=/MQHA/bin/hamqm_applmon.$1
+cat > $apmon << EOF
+#!/bin/ksh
+su mqm -c /MQHA/bin/hamqm_applmon_su $1
+EOF
+chmod +x $apmon

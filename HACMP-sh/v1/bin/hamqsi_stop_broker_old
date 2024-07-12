@@ -1,0 +1,132 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+#
+# Module:
+#   hamqsi_stop_broker
+#
+# Args:
+#   broker = name of broker
+#   timeout = max time to allow for each phase of termination
+#
+# Description:
+#   This script stops the broker, forcibly if necessary.
+#   The script should be run by the user account under which 
+#   the broker is run, including environment. 
+
+BROKER=$1
+TIMEOUT=$2
+
+if [ -z "$BROKER" ]
+then
+  echo "hamqsi_stop_broker: ERROR! No broker name supplied"
+  echo "   Usage: hamqsi_stop_broker <BROKER> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$TIMEOUT" ]
+then
+  echo "hamqsi_stop_broker: ERROR! No timeout supplied"
+  echo "   Usage: hamqsi_stop_broker <BROKER> <TIMEOUT>"
+  exit 1
+fi
+
+# Invoke Pre-Offline user exit, if one exists
+if [ -x /MQHA/bin/rc.mqsi ]
+then
+  echo "hamqsi_stop_broker: Run pre-offline script for ${BROKER}"
+  /MQHA/bin/rc.mqsi ${BROKER} pre_offline &
+  # Exit code from pre_offline script is deliberately ignored
+fi
+
+for severity in normal immediate terminate
+do
+  # Issue the stop method in the background - we don't
+  # want to risk having it hang us up, indefinitely. We
+  # want to be able to concurrently run a TIMEOUT timer
+  # to give up on the attempt, and try a more forceful 
+  # stop. If the kill version fails then there is nothing 
+  # more we can do here anyway.
+  
+  echo "hamqsi_stop_broker: Attempting ${severity} stop of ${BROKER}"
+  case $severity in
+
+  normal)
+    # Minimum severity of stop is to issue mqsistop
+    mqsistop $BROKER > /dev/null 2>&1 &
+    ;;
+
+  immediate)
+    # This is an immediate stop.
+    mqsistop $BROKER -i > /dev/null 2>&1 &
+    ;;
+
+  terminate)
+    # This is a brutal means of mopping up Broker processes.
+    # We stop the processes in the following order:
+    #   bipservice       - first so it cannot issue restarts
+    #   bipbroker        - next for same reason
+    #   biphttplistener
+    #   DataFlowEngines  - last
+    for process in bipservice bipbroker biphttplistener DataFlowEngine 
+    do
+      # Output of kill redirected to /dev/null in case no processes
+      ps -ef | grep "$process $BROKER" | grep -v grep | \
+        awk '{print $2}'| xargs kill -9 > /dev/null 2>&1
+    done
+    ;;
+
+  esac
+
+  echo "hamqsi_stop_broker: Waiting for ${severity} stop of ${BROKER} to complete"
+  TIMED_OUT=yes
+  SECONDS=0
+  while (( $SECONDS < ${TIMEOUT} ))
+  do
+    # See whether there are any broker processes still running 
+    cnt=`ps -ef | \
+      grep -E "bipservice $BROKER|bipbroker $BROKER|DataFlowEngine $BROKER|biphttplistener $BROKER" | \
+      grep -v grep | wc -l`
+    if [ $cnt -gt 0 ]
+    then
+      # It's still running...wait for timeout
+      sleep 1 # loop granularity
+    else
+      # It's stopped, as desired
+      echo "${BROKER} has stopped"
+      TIMED_OUT=no
+      break # out of while ..offline timeout loop
+    fi
+  done # timeout loop
+
+  if [ ${TIMED_OUT} = "yes" ]
+  then
+    continue        # to next level of urgency
+  else
+    break           # instance is stopped, job is done
+  fi
+
+done # next level of urgency
+
+if [ ${TIMED_OUT} = "no" ]
+then
+  echo "hamqsi_stop_broker: Completed"
+  exit 0
+else
+  echo "hamqsi_stop_broker: Completed with errors"
+  exit 1
+fi
+

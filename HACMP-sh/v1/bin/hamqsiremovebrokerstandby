@@ -1,0 +1,75 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module: hamqsiremovebrokerstandby
+#
+# Args:
+#   broker = name of broker to delete
+#
+# Description:
+#   This script deletes broker standby information from a node. 
+#   It detects that the node is a standby before removing it.
+#
+#   Runs as root.
+
+
+# Check running as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Parse the args for BROKER
+BROKER=$1
+
+if [ -z "$BROKER" ]           
+then                        
+  echo "hamqsiremovebrokerstandby: ERROR! No broker supplied"
+  echo "   Usage: hamqsiremovebrokerstandby <BROKER>"
+  exit 1                    
+fi                          
+                            
+
+# Work out whether the broker is locally present, by trying to cd to
+# broker directory. If it is, then report to user that this is not
+# a standby node! Output is redirected because we expect this to fail.
+curdir=`pwd`
+cd /var/mqsi/components/$BROKER > /dev/null 2>&1
+rc=$?
+if [ $rc -eq 0 ]
+then
+  echo "hamqsiremovebrokerstandby: "
+  echo "\t This node currently has the broker files locally mounted"
+  echo "\t You should only run this script on a standby node"
+  exit 1
+fi
+cd $curdir
+
+# The brokers/$BROKER and registry/$BROKER directories for this broker
+# are not mounted on this node. Remove the symlinks.
+curdir=`pwd`
+cd /var/mqsi/components
+echo "hamqsiremovebrokerstandby: Removing symlink for components/$BROKER"
+rm -f $BROKER               # delete the symlink
+cd /var/mqsi/registry
+echo "hamqsiremovebrokerstandby: Removing symlink for registry/$BROKER"
+rm -f $BROKER               # delete the symlink
+cd $curdir
+
+echo "hamqsiremovebrokerstandby: Completed"
+
+exit 0

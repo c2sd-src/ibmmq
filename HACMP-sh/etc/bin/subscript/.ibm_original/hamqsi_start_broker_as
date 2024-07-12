@@ -1,0 +1,124 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+#
+# Module:
+#   hamqsi_start_broker_as
+#
+# Args:
+#   broker = broker name
+#   qm     = name of broker queue manager
+#   mquser = user account under which QM and Broker are run
+#   dbinst = name of database instance which contains broker db
+#   dbname = name of broker db
+#
+# Description:
+#   Starting an MQSI Broker requires the following services:
+#   (1) The MQSeries Queue Manager which supports the Broker  
+#   (2) The DataBase used for the Broker configuration data
+#   (3) The MQSI Broker service 
+#   This script provides a single source to initiate the required 
+#   services in sequence. 
+#  
+#   Queue Manager:
+#   This script uses the hamqm_start_su script supplied by MQSeries
+#   SupportPac MC63: MQSeries for AIX - Implementing with HACMP, 
+#   to start the MQSeries Queue Manager. The hamqm_start_su script 
+#   ensures that the QM is fully stopped before starting it.
+#  
+#   Database Instance and Database:
+#   This script ensures the database instance is not already running,
+#   and then invokes the DB2 HACMP sample hacmp-s1.sh script to start
+#   the database instance and restart the database. Note that the 
+#   hacmp-s1.sh script assumes that the database has autorestart 
+#   disabled. 
+#  
+#   Broker:
+#   This script then invokes the hamqsi_start_broker script which 
+#   checks that the broker is fully stopped and then starts it.
+#
+#   The hamqsi_start_broker_as script should be run as root.
+
+
+
+# Check running as root
+
+ 
+BROKER=$1
+QM=$2
+MQUSER=$3
+
+# Check all parameters exist
+
+if [ -z "$BROKER" ]
+then
+  echo "hamqsi_start_broker_as: ERROR! No Broker name supplied"
+  echo "   Usage: hamqsi_start_broker_as <BROKER> <QM> <MQUSER> <DBINST> <DBNAME>"
+  exit 1
+fi
+
+if [ -z "$QM" ]
+then
+  echo "hamqsi_start_broker_as: ERROR! No queue manager name supplied"
+  echo "   Usage: hamqsi_start_broker_as <BROKER> <QM> <MQUSER> <DBINST> <DBNAME>"
+  exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+  echo "hamqsi_start_broker_as: ERROR! No Userid supplied"
+  echo "   Usage: hamqsi_start_broker_as <BROKER> <QM> <MQUSER> <DBINST> <DBNAME>"
+  exit 1
+fi
+
+# Up to this point, this script has assumed that the Database Instance id 
+# and Database Instance name are the same. If this is not the case for the 
+# database manager you are using then modify the args to this script and 
+# the following line. The remainder of the script will treat DBUSER and 
+# DBINST as the user id and instance name respectively. 
+DBUSER=$DBINST
+
+
+# ------------------------------------------------------------------- 
+# Start the Queue Manager by using the MC63 start script
+#
+echo "hamqsi_start_broker_as: Start Queue manager " $QM 
+echo "su - mqm"
+su - mqm -c "${HASCRIPT_DIR}/bin/subscript/hamqm_start_su $QM"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsi_start_broker_as: Could not start the queue manager"
+  exit $rc
+fi
+
+
+
+# ------------------------------------------------------------------- 
+# Start the Broker
+#
+# Ensure that the Broker is not already running and start the Broker 
+echo "su - $MQUSER"
+su - $MQUSER -c "${HASCRIPT_DIR}/bin/subscript/hamqsi_start_broker $BROKER" 1> /dev/null
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsi_start_broker_as: Could not start the broker"
+  exit $rc
+fi
+
+exit $rc
+

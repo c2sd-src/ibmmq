@@ -1,0 +1,74 @@
+#!/usr/bin/ksh
+
+USERNAME=mqm
+EAI_BIN=/prod/eai/aheai2/bin
+
+if [ `whoami` != $USERNAME ]
+then
+  echo "Need to be running as $USERNAME user"
+  exit 1
+fi
+
+QMGR=$1
+
+SCRIPT=$0
+
+        case $2 in
+                start)
+                echo "############################"
+                echo "# Start MQ/Trigger Monitor #"
+                echo "############################"
+                echo `date` $SCRIPT starting MQ/Trigger Monitor
+                ${EAI_BIN}/runmqtrm_d $QMGR & > /dev/null 2>&1
+                sleep 5
+                if [ `ps -ef | grep -v grep | grep mqm | grep runmqtrm | grep ${QMGR}.00.IQ | wc -l` = "0" ]
+                then
+                        echo "\nWMQ/Trigger Monitor Status: Stopped"
+                else
+                        echo "\nWMQ/Trigger Monitor Status: Running"
+                fi
+
+                ;;
+                stop)
+                echo "############################"
+                echo "# Stop MQ/Trigger Monitor  #"
+                echo "############################"
+                echo `date` $SCRIPT stopping MQ/Trigger Monitor
+                ps -ef |grep -v grep | grep runmqtrm |grep ${QMGR}.00.IQ|awk '{print "kill -9", $2}' | sh -v >/dev/null 2>&1
+                sleep 5
+                if [ `ps -ef | grep -v grep | grep mqm | grep runmqtrm |grep ${QMGR}.00.IQ| wc -l` = "0" ]
+                then
+                        echo "\nMQ/Trigger Monitor Status: Stopped"
+                else
+                        echo "\nMQ/Trigger Monitor Status: Running"
+                fi
+                ;;
+
+                recover)
+                echo "##############################"
+                echo "# Recover MQ/Trigger Monitor #"
+                echo "##############################"
+                if [ `ps -ef | grep -v grep | grep mqm | grep runmqtrm |grep ${QMGR}.00.IQ| wc -l` = "0" ]
+                then
+                	${EAI_BIN}/runmqtrm_d $QMGR & > /dev/null 2>&1
+                        echo "Recover MQ/Trigger Monitor"
+                else
+                        echo "\nMQ/Trigger Monitor Status: Running"
+                fi
+                ;;
+
+                status)
+                echo "#############################"
+                echo "# Status MQ/Trigger Monitor #"
+                echo "#############################"
+                if [ `ps -ef | grep -v grep | grep mqm | grep runmqtrm |grep ${QMGR}.00.IQ| wc -l` = "0" ]
+                then
+                        echo "\nMQ/Trigger Monitor Status: Stopped"
+                else
+                        echo "\nMQ/Trigger Monitor Status: Running"
+                fi
+                ;;
+                *) echo "Usage $0 [QMGR Name] start|stop|status"
+                break;;
+        esac
+return 0

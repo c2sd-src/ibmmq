@@ -1,0 +1,139 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# 
+# Module: mqsicreatecfgmgr
+#  
+# Args:
+#   Arguments are the same as for mqsicreatecfgmgr
+#
+# Description:
+#   This script creates an MQSI config manager so that it can run 
+#   in an HA cluster.
+#
+#   Runs as root and uses su when creating config manager
+# 
+#
+
+
+
+# Must be run as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Save the supplied arguments - we'll need it below
+ORIG_ARGS=$*
+
+# Parse the args for $CFGMGR, $QM & $MQUSER
+CFGMGR=$1
+
+if [ `echo $CFGMGR | grep '\-' | wc -l` == 1  ]
+then
+   echo "hamqsicreatecfgmgr: ERROR! No Configuration Manager name supplied"
+   echo "hamqsicreatecfgmgr: Specify parameters as with mqsicreatebroker"
+   exit 1
+fi
+
+# Parse the remaining args to find the QM and MQUSER
+shift # to get past the config manager name argument
+while getopts :i:q: arguments
+do
+  case $arguments in
+    i) MQUSER=$OPTARG;;
+    q) QM=$OPTARG;;
+    :) echo "Missing argument to $OPTARG switch";;
+    \?) shift;; # ignore other (valid) switch and shift past its argument
+  esac
+done
+
+# Test that we have QM, and MQUSER args set
+if [ -z "$QM" ]
+then
+   echo "hamqsicreatecfgmgr: ERROR! No queue manager name supplied"
+   echo "hamqsicreatecfgmgr: Specify parameters as with mqsicreateconfigmgr"
+   exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+   echo "hamqsicreatecfgmgr: ERROR! No userid supplied"
+   echo "hamqsicreatecfgmgr: Specify parameters as with mqsicreateconfigmgr"
+   exit 1
+fi
+
+# Create the config manager
+su - $MQUSER -c "mqsicreateconfigmgr $ORIG_ARGS"
+if [ $? -ne "0" ]
+then
+  echo "hamqsicreatecfgmgr: Error from mqsicreateconfigmgr command"
+  exit 1
+fi
+
+# Now find out where the datapath of the QM is.
+DATAPATH=`./hamqsi_qm_datapath $QM`
+echo "Config manager directories will be moved to be under $DATAPATH"
+
+# The components/$CFGMGR and registry/$CFGMGR directories for this config manager
+# will be moved to the QM data directory, which is on shared disk. Symbolic 
+# links are then created.
+#
+curdir=`pwd`
+
+cd /var/mqsi/components
+echo "hamqsicreatecfgmgr: Moving components/$CFGMGR directory to $QM/data directory"
+if [ ! -d $DATAPATH/components ]
+then
+  mkdir $DATAPATH/components
+fi
+cp -Rp $CFGMGR $DATAPATH/components
+rm -fr $CFGMGR
+ln -fs $DATAPATH/components/$CFGMGR $CFGMGR
+
+cd /var/mqsi/registry  
+echo "hamqsicreatecfgmgr: Moving registry/$CFGMGR directory to $QM/data directory"
+if [ ! -d $DATAPATH/registry ]
+then
+  mkdir $DATAPATH/registry
+fi
+cp -Rp $CFGMGR $DATAPATH/registry
+rm -fr $CFGMGR
+ln -fs $DATAPATH/registry/$CFGMGR $CFGMGR
+cd $curdir
+
+
+# Create an Application Monitor
+# HACMP/ES does not seem to support passing parameters to application
+# monitoring scripts. So we need to create a unique monitor script for
+# the combination of config manager, qm and dbinst. The auto-created script
+# is called /MQHA/bin/hamqsi_applmon.$CFGMGR and it is this script which 
+# is entered in the HACMP/ES configuration panels.
+#
+apmon=/MQHA/bin/hamqsi_applmon.$CFGMGR
+cat > $apmon << EOF
+#!/bin/ksh
+/MQHA/bin/hamqsi_monitor_broker_as $CFGMGR $QM $DBINST $MQUSER
+EOF
+chmod +x $apmon
+
+
+echo "hamqsicreatecfgmgr:"
+echo "\t You need to run hamqsiaddcfgmgrstandby $CFGMGR $QM $MQUSER on standby nodes"
+
+
+exit 0

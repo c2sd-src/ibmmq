@@ -1,0 +1,97 @@
+#
+#!/bin/ksh
+# Module:
+#   hamqsi_start_broker_as
+#
+# Args:
+#   broker   = broker name
+#   qm       = name of broker queue manager
+#   mquser   = user account under which QM are run
+#   mqsiuser = user account under which Broker are run
+#
+# Description:
+#   Starting an MQSI Broker requires the following services:
+#   (1) The MQSeries Queue Manager which supports the Broker  
+#   (2) The MQSI Broker service 
+#   This script provides a single source to initiate the required 
+#   services in sequence. 
+#  
+#   Queue Manager:
+#   This script uses the strmqm script supplied by MQSeries V7
+#  
+#   Broker:
+#   This script then invokes the hamqsi_start_broker script which 
+#   checks that the broker is fully stopped and then starts it.
+#
+#   The hamqsi_start_broker_as script should be run as root.
+
+
+
+# Check running as root
+#if [ `id -u`  -ne 0 ]
+#then
+#  echo "Must be running as root"
+#  exit 1
+#fi
+
+ 
+BROKER=$1
+QM=$2
+MQUSER=$3
+MQSIUSER=$4
+
+# Check all parameters exist
+
+if [ -z "$BROKER" ]
+then
+  echo "hamqsi_start_broker_as: ERROR! No Broker name supplied"
+  echo "  Usage: hamqsi_start_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER>"
+  exit 1
+fi
+
+if [ -z "$QM" ]
+then
+  echo "hamqsi_start_broker_as: ERROR! No queue manager name supplied"
+  echo "  Usage: hamqsi_start_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER>"
+  exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+  echo "hamqsi_start_broker_as: ERROR! No MQ Userid supplied"
+  echo "  Usage: hamqsi_start_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER>"
+  exit 1
+fi
+
+if [ -z "$MQSIUSER" ]
+then
+  echo "hamqsi_start_broker_as: ERROR! No MQSI Userid supplied"
+  echo "  Usage: hamqsi_start_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER>"
+  exit 1
+fi
+
+# ------------------------------------------------------------------- 
+# Start the Queue Manager 
+#
+echo "hamqsi_start_broker_as: Start Queue manager " $QM 
+su $MQUSER -c "/MQHA/bin/hamqm_start_su $QM"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsi_start_broker_as: Could not start the queue manager"
+  exit $rc
+fi
+
+# ------------------------------------------------------------------- 
+# Start the Broker
+#
+# Ensure that the Broker is not already running and start the Broker 
+su - $MQSIUSER -c "/MQHA/bin/hamqsi_start_broker $BROKER"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsi_start_broker_as: Could not start the broker"
+  exit $rc
+fi
+
+exit $rc

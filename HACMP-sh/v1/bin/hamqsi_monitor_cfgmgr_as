@@ -1,0 +1,181 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module:
+#   hamqsi_monitor_cfgmgr_as
+#
+# Args:
+#   CFGMGR = name of cfgmgr 
+#   QM     = name of queue manager 
+#   MQUSER = userid under which queue manager and cfgmgr run
+# 
+# Description:
+#   This is the application monitor script used with HACMP/ES. It 
+#   needs to be invoked by a parameter-less wrapper script because
+#   HACMP does not allow parameters to be passed to application
+#   monitor scripts.
+#  
+#   This hamqsi_monitor_cfgmgr_as script is run as root, and uses 
+#   su as needed to monitor the 3 components of the application server.
+#  
+#   This script is tolerant of a queue manager that is still in
+#   startup or a database instance that is still in startup. If 
+#   either the queue manager or database is still starting this
+#   application monitor script will exit with 0 - which indicates
+#   to HACMP that there's nothing wrong. This is to allow for
+#   startup time for the queue manager and database instance
+#   which may exceed the Stabilisation Interval set for the 
+#   Application Monitor in HACMP/ES.
+#    
+# Exit codes:
+#   0  => Broker & QM are all running OK or starting
+#   >0 => One or more components are not responding.
+#
+
+# Check running as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+
+CFGMGR=$1
+QM=$2
+MQUSER=$3
+
+
+# Check the parameters
+
+if [ -z "$CFGMGR" ]
+then
+  echo "hamqsi_monitor_cfgmgr_as: ERROR! No cfgmgr name supplied"
+  exit 1
+fi
+
+if [ -z "$QM" ]
+then
+  echo "hamqsi_monitor_cfgmgr_as: ERROR! No queue manager name supplied"
+  exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+  echo "hamqsi_monitor_cfgmgr_as: ERROR! No mquser supplied"
+  exit 1
+fi
+
+# Use a state variable to reflect the state of components as they
+# are tested. Valid values are "stopped", "starting" and "started"
+# Initialise it to "stopped" for safety. 
+STATE="stopped"
+
+
+
+# ------------------------------------------------------------------
+# Check that the queue manager is running or starting.
+# We can't use the MC91 applmon for this as it has to return a 
+# boolean and we need to be able to differentiate between 
+# starting and started so that we know whether to go on and 
+# test cfgmgr.
+#
+
+su - $MQUSER -c "echo "ping qmgr" | runmqsc ${QM}" > /dev/null 2>&1
+pingresult=$?
+# pingresult will be 0 on success; non-zero on error (man runmqsc)
+if [ $pingresult -eq 0 ]
+then 
+  # ping succeeded
+  echo "hamqsi_monitor_cfgmgr_as: Queue Manager ${QM} is responsive"
+  STATE="started"
+else 
+  # ping failed
+  # Don't condemn the QM immediately, it may be in startup.
+  # The following regexp includes a space and a tab, so use tab-friendly
+  # editors.
+  srchstr=" $QM[	 ]*$"
+  cnt=`ps -ef | grep strmqm | grep "$srchstr" | grep -v grep \
+                | awk '{print $2}' | wc -l`
+  if [ $cnt -gt 0 ]
+  then
+    # It appears that QM is still starting up, tolerate
+    echo "hamqsi_monitor_cfgmgr_as: Queue Manager ${QM} is starting"
+    STATE="starting"
+  else
+    # There is no sign of QM start process
+    echo "hamqsi_monitor_cfgmgr_as: Queue Manager ${QM} is not responsive"
+    STATE="stopped"
+  fi
+fi
+
+
+# Decide whether to continue or to exit
+case $STATE in
+  stopped)
+    echo "hamqsi_monitor_cfgmgr_as: Queue manager ($QM) is not running correctly"
+    exit 1  
+    ;;
+  starting)
+    echo "hamqsi_monitor_cfgmgr_as: Queue manager ($QM) is starting"
+    echo "hamqsi_monitor_cfgmgr_as: WARNING - Stabilisation Interval may be too short"
+    echo "hamqsi_monitor_cfgmgr_as: WARNING - No test of cfgmgr $CFGMGR will be conducted"
+    exit 0  
+    ;;
+  started)
+    echo "hamqsi_monitor_cfgmgr_as: Queue manager ($QM) is running"
+    continue # proceed by testing database instance  
+    ;;
+esac
+
+
+# ------------------------------------------------------------------
+# Check the MQSI Config manager is running 
+# 
+# Re-initialise STATE for safety
+STATE="stopped"
+#
+# The cfgmgr runs as a process called bipservice which is responsible
+# for starting and re-starting the admin agent process (bipconfigmgr). 
+# There should always be a bipservice
+# and bipconfigmgr process pair. This monitor script only tests for 
+# bipservice, because bipservice should restart bipconfigmgr if necessary
+# - the monitor script should not attempt to restart bipbroker and 
+# it may be premature to report an absence of a bipconfigmgr as a failure.
+#
+cnt=`ps -ef | grep "bipservice $CFGMGR" | grep -v grep | wc -l`
+if [ $cnt -eq 0 ]
+then 
+  echo "hamqsi_monitor_cfgmgr_as: MQSI Configuration Manager $CFGMGR is not running"
+  STATE="stopped"
+else
+  echo "hamqsi_monitor_cfgmgr_as: MQSI Configuration Manager $CFGMGR is running" 
+  STATE="started"
+fi
+
+# Decide how to exit
+case $STATE in
+  stopped)
+    echo "hamqsi_monitor_cfgmgr_as: Configuration Manager ($CFGMGR) is not running correctly"
+    exit 1  
+    ;;
+  started)
+    echo "hamqsi_monitor_cfgmgr_as: Configuration Manager ($CFGMGR) is running"
+    exit 0  
+    ;;
+esac
+
+
+

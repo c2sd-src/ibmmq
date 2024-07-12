@@ -1,0 +1,131 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# 
+# Module: hamqsiaddunsstandby
+#  
+# Args:
+#   qm     = name of queue manager UNS uses
+#   mquser = user id under which queue manager and UNS run
+#
+# DESCRIPTION:
+#   This script configures a standby node so that it can
+#   host the UNS
+#
+#   You run this on any nodes which may host the UNS, except the 
+#   one on which the UNS exists.
+#
+#   This script must be run as root.
+
+
+# Check running as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Parse the args for $QM & $MQUSER
+QM=$1
+MQUSER=$2
+
+# Test that all necessary parameters are set
+
+if [ -z "$QM" ]
+then
+  echo "hamqsiaddunsstandby: ERROR! No queue manager name supplied"
+  echo "   Usage: hamqsiaddunsstandby <QM> <MQUSER>"
+  exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+  echo "hamqsiaddunsstandby: ERROR! No userid supplied"
+  echo "   Usage: hamqsiaddunsstandby <QM> <MQUSER>"
+  exit 1
+fi
+
+# Perform a check that the UNS does not already exist on this
+# machine - and that the /var/mqsi/components and /var/mqsi/registry
+# directories do not already have entries (either real or links)
+# for the UNS. If they have, then warn the user to clean up
+# and retry.
+if [ -d /var/mqsi/components/UserNameServer -o -h /var/mqsi/components/UserNameServer ]
+then
+  echo "hamqsiaddunsstandby: "
+  echo "\t UserNameServer already has an entry in /var/mqsi/components"
+  echo "\t Please ensure this is a standby machine and remove the"
+  echo "\t UserNameServer directory or symlink under /var/mqsi/components"
+  exit 1
+fi
+if [ -d /var/mqsi/registry/UserNameServer -o -h /var/mqsi/registry/UserNameServer ]
+then
+  echo "hamqsiaddunsstandby: "
+  echo "\t UserNameServer already has an entry in /var/mqsi/registry"
+  echo "\t Please ensure this is a standby machine and remove the"
+  echo "\t UserNameServer directory or symlink under /var/mqsi/registry"
+  exit 1
+fi
+
+
+# Now find out where the datapath of the QM is.
+DATAPATH=`./hamqsi_qm_datapath $QM`
+
+if [ -z "$DATAPATH" ]                                    
+then                                                   
+  echo "hamqsiaddunsstandby: "
+  echo "\t Directory structure for $QM not found in mqs.ini"
+  echo "\t Please check your configuration is ready to issue this command"
+  exit 1                                               
+fi                                                     
+
+echo "Symbolic links will be created which link to directories under $DATAPATH"
+
+
+# Create the symlinks to the UserNameServer directories from this machine.
+# The brokers and registry directories for the UNS are in the QM data 
+# components, which is on shared disk. They are not currently mounted on
+# this machine, but that's OK. Create symlinks to the directories from 
+# /var/mqsi/components and /var/mqsi/registry.
+#
+curdir=`pwd`
+cd /var/mqsi/components
+echo "hamqsiaddunsstandby: Creating symbolic link to components/UserNameServer"
+ln -fs $DATAPATH/components/UserNameServer UserNameServer
+cd /var/mqsi/registry  
+echo "hamqsiaddunsstandby: Creating symbolic link to registry/UserNameServer"
+ln -fs $DATAPATH/registry/UserNameServer UserNameServer
+cd $curdir
+
+
+# Create an Application Monitor on this machine.
+# HACMP/ES does not support passing parameters to application
+# monitoring scripts. So we need to create a unique monitor script for
+# the combination of UNS and QM. The auto-created script is called
+# /MQHA/bin/hamqsi_applmon.UNS. It is this script which should be 
+# entered in the HACMP/ES configuration panels.
+#
+echo "hamqsiaddunsstandby: Creating application monitor script " \
+       "/MQHA/bin/hamqsi_applmon.UNS"
+apmon=/MQHA/bin/hamqsi_applmon.UNS
+cat > $apmon << EOF
+#!/bin/ksh
+/MQHA/bin/hamqsi_monitor_uns_as $QM $MQUSER
+EOF
+chmod +x $apmon
+
+echo "hamqsiaddunsstandby: Completed successfully"
+

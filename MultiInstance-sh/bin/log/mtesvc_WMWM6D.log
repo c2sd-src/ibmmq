@@ -1,0 +1,510 @@
+\nWMWM6D Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 15:23:15 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+WMWM6D.EAIBK3P.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+WMWM6D.SMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+EAIBK3P.WMWM6D.B1 CHANNEL is already running...
+EAIBK3P.WMWM6D.N1 CHANNEL is already running...
+SMEAI1D.WMWM6D.B1 CHANNEL is already running...
+SMEAI1D.WMWM6D.N1 CHANNEL is already running...
+WMEAI1D.WMWM6D.B1 CHANNEL is already running...
+WMEAI1D.WMWM6D.N1 CHANNEL is already running...
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  RUNNING
+\nMTE Adapter starting...
+\nMTE Control Center Agent Starting.
+\nMTE Control Center Agent stopping.
+\nWMWM6D Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 15:23:43 KST MQSeries Message Channel Stop
+WMWM6D.EAIBK3P.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.EAIBK3P.B1)
+WMWM6D.EAIBK3P.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.EAIBK3P.N1)
+WMWM6D.SMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  STOPPED
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  STOPPED
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  STOPPED
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  STOPPED
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  RUNNING
+\nMTE Adapter stopping...
+\nMTE Control Center Agent stopping.
+\nWMWM6D Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:15:26 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+\nMTE Adapter stopping...
+\nWMWM6D Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:17:49 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.B1)
+EAIBK3P.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.N1)
+SMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.B1)
+SMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.N1)
+WMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.B1)
+WMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	: 
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  REQUESTING
+\nMTE Adapter starting...
+\nMTE Control Center Agent Starting.
+\nMTE Control Center Agent stopping.
+\nWMWM6D Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:45:50 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+\nMTE Adapter stopping...
+\nWMWM6D Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:46:07 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.B1)
+EAIBK3P.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.N1)
+SMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.B1)
+SMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.N1)
+WMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.B1)
+WMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	: 
+\nMTE Adapter starting...
+\nMTE Control Center Agent Starting.
+
+MTE Control Center Agent stopping.
+
+WMWM6D Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:51:27 KST MQSeries Message Channel Stop
+SENDER CHANNEL STATUS
+REQSTR CHANNEL STATUS
+
+MTE Adapter stopping...
+
+WMWM6D Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 18. (화) 16:51:52 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.EAIBK3P.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.SMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.B1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+inactive is invoking. abnormal need status check
+WMWM6D.WMEAI1D.N1 CHANNEL status is inactive OR abnormal...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+inactive is invoking. abnormal need status check
+EAIBK3P.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.B1)
+EAIBK3P.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(EAIBK3P.WMWM6D.N1)
+SMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.B1)
+SMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(SMEAI1D.WMWM6D.N1)
+WMEAI1D.WMWM6D.B1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.B1)
+WMEAI1D.WMWM6D.N1 CHANEEL is invoking...
+     1 : start chl(WMEAI1D.WMWM6D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  REQUESTING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  REQUESTING
+
+MTE Adapter starting...
+
+MTE Control Center Agent Starting.
+2024/06/24 16:57:21(198)(4619)	ODBC Error Level 9 at function mea_modbc::db_prepare(mea_modbc.cpp:213)	08S01 - SQLPrepare unable due to the connection lost	SQLPrepare error	
+2024/06/24 16:57:21(212)(4619)	Info: Exception
+2024/06/24 16:57:21(229)(4619)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/24 16:57:21(429)(4608)	ODBC Error Level 9 at function mea_modbc::db_prepare(mea_modbc.cpp:213)	08S01 - SQLPrepare unable due to the connection lost	SQLPrepare error	
+2024/06/24 16:57:21(439)(4608)	Info: Exception
+2024/06/24 16:57:21(455)(4608)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/24 16:57:21(921)(4630)	ODBC Error Level 9 at function mea_modbc::db_prepare(mea_modbc.cpp:213)	08S01 - SQLPrepare unable due to the connection lost	SQLPrepare error	
+2024/06/24 16:57:21(931)(4630)	Info: Exception
+2024/06/24 16:57:21(946)(4630)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+2024/06/24 16:57:24(631)(4597)	ODBC Error Level 9 at function mea_modbc::db_prepare(mea_modbc.cpp:213)	08S01 - SQLPrepare unable due to the connection lost	SQLPrepare error	
+2024/06/24 16:57:24(639)(4597)	Info: Exception
+2024/06/24 16:57:24(656)(4597)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml
+
+MTE Control Center Agent stopping.
+
+WMWM6D Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 25. (화) 14:31:54 KST MQSeries Message Channel Stop
+WMWM6D.EAIBK3P.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.EAIBK3P.B1)
+WMWM6D.EAIBK3P.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.EAIBK3P.N1)
+WMWM6D.SMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  STOPPED
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  STOPPED
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  STOPPED
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  STOPPED
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  RUNNING
+
+MTE Adapter stopping...
+
+WMWM6D Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 25. (화) 14:33:44 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+WMWM6D.EAIBK3P.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+WMWM6D.SMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+EAIBK3P.WMWM6D.B1 CHANNEL is already running...
+EAIBK3P.WMWM6D.N1 CHANNEL is already running...
+SMEAI1D.WMWM6D.B1 CHANNEL is already running...
+SMEAI1D.WMWM6D.N1 CHANNEL is already running...
+WMEAI1D.WMWM6D.B1 CHANNEL is already running...
+WMEAI1D.WMWM6D.N1 CHANNEL is already running...
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  RUNNING
+
+MTE Adapter starting...
+2024/06/25 14:33:48(311)(27620)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml
+2024/06/25 14:33:48(311)(27620)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml
+2024/06/25 14:33:48(384)(27631)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/25 14:33:48(384)(27631)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/25 14:33:48(444)(27642)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/25 14:33:48(444)(27642)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/25 14:33:48(511)(27654)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+2024/06/25 14:33:48(511)(27654)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+
+MTE Control Center Agent Starting.
+
+MTE Control Center Agent stopping.
+
+WMWM6D Channel stopping
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 25. (화) 14:36:08 KST MQSeries Message Channel Stop
+WMWM6D.EAIBK3P.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.EAIBK3P.B1)
+WMWM6D.EAIBK3P.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.EAIBK3P.N1)
+WMWM6D.SMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is stopping...
+     1 : stop chl(WMWM6D.WMEAI1D.N1)
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  STOPPED
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  STOPPED
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  STOPPED
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  STOPPED
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  STOPPED
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  RUNNING
+
+MTE Adapter stopping...
+2024/06/25 14:33:48(444)(27642)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/25 14:36:11(969)(27645)	Info: unexpected signal : 15, adapter will be terminated
+2024/06/25 14:36:11(979)(27645)	Info: Stop signal/signal received : Adapter stop
+2024/06/25 14:36:11(996)(27645)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/25 14:33:48(384)(27631)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/25 14:36:12(980)(27633)	Info: unexpected signal : 15, adapter will be terminated
+2024/06/25 14:36:12(990)(27633)	Info: Stop signal/signal received : Adapter stop
+2024/06/25 14:36:13(013)(27633)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/25 14:33:48(311)(27620)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml
+2024/06/25 14:36:11(960)(27622)	Info: unexpected signal : 15, adapter will be terminated
+2024/06/25 14:36:14(997)(27622)	Info: Stop signal/signal received : Adapter stop
+2024/06/25 14:36:15(015)(27622)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml
+2024/06/25 14:33:48(511)(27654)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+2024/06/25 14:36:19(027)(27656)	Info: unexpected signal : 15, adapter will be terminated
+2024/06/25 14:36:19(036)(27656)	Info: Stop signal/signal received : Adapter stop
+2024/06/25 14:36:19(053)(27656)	Info: Adapter ended : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+
+WMWM6D Channel Starting
+####################################################
+#      MQSeries Message Channel Operation Tool     #
+#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #
+####################################################
+####################################################
+#         Start MQSeries SENDER CHANNEL            #
+####################################################
+2024. 06. 25. (화) 14:36:25 KST MQSeries Message Channel Start
+WMWM6D.EAIBK3P.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.EAIBK3P.B1)
+WMWM6D.EAIBK3P.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.EAIBK3P.N1)
+WMWM6D.SMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.B1)
+WMWM6D.SMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.SMEAI1D.N1)
+WMWM6D.WMEAI1D.B1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.B1)
+WMWM6D.WMEAI1D.N1 CHANEEL is invoking...
+     1 : start chl(WMWM6D.WMEAI1D.N1)
+EAIBK3P.WMWM6D.B1 CHANNEL is already running...
+EAIBK3P.WMWM6D.N1 CHANNEL is already running...
+SMEAI1D.WMWM6D.B1 CHANNEL is already running...
+SMEAI1D.WMWM6D.N1 CHANNEL is already running...
+WMEAI1D.WMWM6D.B1 CHANNEL is already running...
+WMEAI1D.WMWM6D.N1 CHANNEL is already running...
+SENDER CHANNEL STATUS
+Status Channel Name : WMWM6D.EAIBK3P.B1 	:  RUNNING
+Status Channel Name : WMWM6D.EAIBK3P.N1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.SMEAI1D.N1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.B1 	:  RUNNING
+Status Channel Name : WMWM6D.WMEAI1D.N1 	:  RUNNING
+REQSTR CHANNEL STATUS
+Status Channel Name : EAIBK3P.WMWM6D.B1 	:  RUNNING
+Status Channel Name : EAIBK3P.WMWM6D.N1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : SMEAI1D.WMWM6D.N1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.B1 	:  RUNNING
+Status Channel Name : WMEAI1D.WMWM6D.N1 	:  RUNNING
+
+MTE Adapter starting...
+2024/06/25 14:36:29(350)(31757)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml
+2024/06/25 14:36:29(350)(31757)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml
+2024/06/25 14:36:29(403)(31768)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/25 14:36:29(403)(31768)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/25 14:36:29(466)(31799)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/25 14:36:29(466)(31799)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/25 14:36:29(519)(31830)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+2024/06/25 14:36:29(519)(31830)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+
+MTE Control Center Agent Starting.
+2024/06/25 14:36:29(403)(31768)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS024.SND.xml
+2024/06/25 14:36:29(519)(31830)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS027.SND.xml
+2024/06/25 14:36:29(466)(31799)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS025.SND.xml
+2024/06/25 14:36:29(350)(31757)	Info: Adapter started [V3.5.5.50] : conf_file = /MQHA/mte/GSSM/adapter/conf/NWM/NWM.WMHQ.NDS023.SND.xml

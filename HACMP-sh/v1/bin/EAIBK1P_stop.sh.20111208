@@ -1,0 +1,105 @@
+#!/bin/ksh
+#Global Variable
+MQUSER=mqm
+BKUSER=mqsi
+QMNAME=EAIBK1P
+BKNAME=EAIBK1P
+DBINST=mqsi
+DBNAME=EAIBK1DB
+MQEQM=GW11
+
+MQHA_BIN=/MQHA/bin
+ZETA_BIN=/mte/kerberos/ZETA/bin
+TIMEOUT=30
+
+#MTE Control Center Agent stop
+echo "\nMTE Control Center Agent stopping."
+su $MQUSER -c "/MQHA/bin/hamteagent_op stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop MTE Agent"
+  exit $rc
+fi
+
+#WMQ Channel stop
+echo "\n$QMNAME Channel stopping"
+su $MQUSER -c "$MQHA_BIN/hamqm_chl $QMNAME stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop $QMNAME Channel"
+  exit $rc
+fi
+
+#MQ Trigger Monitor Stop
+#echo "\n[$QMNAME] Trigger Monitor stopping"
+#su $MQUSER -c "/MQHA/bin/hamqm_trm $QMNAME stop"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not stop WMQ Trigger Monitor"
+#  exit $rc
+#fi
+
+#MQ, WMQI, DB2 stop
+echo "$QMNAME EAI Component Stopping(WMB, WMQ, DB2 instance) in $TIMEOUT SEC."
+$MQHA_BIN/hamqsi_stop_broker_as $BKNAME $QMNAME $BKUSER $DBINST $TIMEOUT 
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop $QMNAME EAI Component"
+  exit $rc
+fi
+
+#MQe Gateway stop
+echo "\nMQe Gateway stopping."
+su $MQUSER -c "${MQHA_BIN}/hamqe_op ${MQEQM} stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop MQe Gateway"
+  exit $rc
+fi
+
+echo "\nMQe Gateway stopping."
+su $MQUSER -c "${MQHA_BIN}/hamqe_op GW21 stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop MQe Gateway"
+  exit $rc
+fi
+
+#ZETA_ONLINE stop
+echo "\nZETA_ONLINE Stopping."
+su $BKUSER -c "/mte/kerberos/ZETA_ONLINE/bin/shutdown.sh"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop ZETA_ONLINE"
+  exit $rc
+fi
+
+#ZETA_ONLINE2 stop
+echo "\nZETA_ONLINE2 Stopping."
+su $BKUSER -c "/mte/kerberos/ZETA_ONLINE2/bin/shutdown.sh"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop ZETA_ONLINE2"
+  exit $rc
+fi
+
+#ZETA_BATCH stop
+echo "\nZETA_BATCH Stop."
+su $BKUSER -c "/mte/kerberos/ZETA_BATCH/bin/shutdown.sh"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop ZETA_BATCH"
+  exit $rc
+fi
+
+
+exit 0

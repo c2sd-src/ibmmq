@@ -1,0 +1,121 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+#
+# Module:
+#   hamqsi_stop_uns
+#
+# Args:
+#   timeout = max time to allow for each phase of termination
+#
+# Description:
+#   This script stops the UNS, forcibly if necessary.
+#   The script should be run by the user account under which 
+#   the UNS is run, including environment. 
+
+TIMEOUT=$1
+
+if [ -z "$TIMEOUT" ]
+then
+  echo "hamqsi_stop_uns: ERROR! No timeout supplied"
+  echo "   Usage: hamqsi_stop_uns <TIMEOUT>"
+  exit 1
+fi
+
+# Invoke Pre-Offline user exit, if one exists
+if [ -x /MQHA/bin/rc.mqsi ]
+then
+  echo "hamqsi_stop_uns: Run pre-offline script for UserNameServer"
+  /MQHA/bin/rc.mqsi UserNameServer pre_offline &
+  # Exit code from pre_offline script is deliberately ignored
+fi
+
+for severity in normal immediate terminate
+do
+  # Issue the stop method in the background - we don't
+  # want to risk having it hang us up, indefinitely. We
+  # want to be able to concurrently run a TIMEOUT timer
+  # to give up on the attempt, and try a more forceful 
+  # stop. If the kill version fails then there is nothing 
+  # more we can do here anyway.
+  
+  echo "hamqsi_stop_uns: Attempting ${severity} stop of UserNameServer"
+  case $severity in
+
+  normal)
+    # Minimum severity of stop is to issue mqsistop
+    mqsistop UserNameServer > /dev/null 2>&1 &
+    ;;
+
+  immediate)
+    # This is an immediate stop.
+    mqsistop UserNameServer -i > /dev/null 2>&1 &
+    ;;
+
+  terminate)
+    # This is a brutal means of mopping up UNS processes.
+    # We stop the processes in the following order:
+    #   bipservice       - first so it cannot issue restarts
+    #   bipuns           - last
+    for process in bipservice bipuns
+    do
+      # Output of kill redirected to /dev/null in case no processes
+      ps -ef | grep "$process UserNameServer" | grep -v grep | \
+        awk '{print $2}'| xargs kill -9 > /dev/null 2>&1
+    done
+    ;;
+
+  esac
+
+  echo "hamqsi_stop_uns: Waiting for ${severity} stop of UserNameServer to complete"
+  TIMED_OUT=yes
+  SECONDS=0
+  while (( $SECONDS < ${TIMEOUT} ))
+  do
+    # See whether there are any UNS processes still running 
+    cnt=`ps -ef | \
+      grep -E "bipservice UserNameServer|bipuns UserNameServer" | \
+      grep -v grep | wc -l`
+    if [ $cnt -gt 0 ]
+    then
+      # It's still running...wait for timeout
+      sleep 1 # loop granularity
+    else
+      # It's stopped, as desired
+      echo "UserNameServer has stopped"
+      TIMED_OUT=no
+      break # out of while ..offline timeout loop
+    fi
+  done # timeout loop
+
+  if [ ${TIMED_OUT} = "yes" ]
+  then
+    continue        # to next level of urgency
+  else
+    break           # instance is stopped, job is done
+  fi
+
+done # next level of urgency
+
+if [ ${TIMED_OUT} = "no" ]
+then
+  echo "hamqsi_stop_uns: Completed"
+  exit 0
+else
+  echo "hamqsi_stop_uns: Completed with errors"
+  exit 1
+fi
+

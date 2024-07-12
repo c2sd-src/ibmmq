@@ -1,0 +1,111 @@
+#!/bin/ksh
+# Module:
+#   hamqsi_stop_broker_as
+#
+# Arguments are:
+#   broker = name of broker 
+#   qm     = name of broker queue manager
+#   mquser = user account under which QM run
+#   mqsiuser = user account under which broker run
+#   timeout = max time to allow each phase of stop processing
+#
+# Description:
+#   This script stops the Broker, Queue Manager in that sequence.
+#  
+#   Broker:
+#   The script invokes the hamqsi_stop_broker script to stop the 
+#   broker, which checks that the broker is fully stopped.
+#  
+#   Queue Manager:
+#   This script uses the strmqm script supplied by MQSeries V7 
+#  
+#   The hamqsi_stop_broker_as script should be run as root. 
+
+
+# Check running as root
+#if [ `id -u`  -ne 0 ]
+#then
+#  echo "Must be running as root"
+#  exit 1
+#fi
+
+ 
+BROKER=$1
+QM=$2
+MQUSER=$3
+MQSIUSER=$4
+TIMEOUT=$5
+
+# Check all parameters
+
+if [ -z "$BROKER" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No Broker name supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$QM" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No queue manager name supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No MQ userid supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$MQSIUSER" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No MQSI userid supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$TIMEOUT" ]
+then
+  echo "hamsi_stop_broker_as: ERROR! No Timeout value supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <MQSIUSER> <TIMEOUT>"
+ exit 1
+fi
+
+
+METHOD_STATUS="OK"
+
+# ------------------------------------------------------------------- 
+# Stop the BROKER
+#
+echo "hamqsi_stop_broker_as: Stop Broker " $BROKER
+su - $MQSIUSER -c "/MQHA/bin/hamqsi_stop_broker $BROKER $TIMEOUT"
+if [ $? -ne "0" ]
+then
+  # Even if the above operation failed, just report and then continue by 
+  # stopping other components
+  echo "hamqsi_stop_broker_as: Attempt to stop broker $BROKER failed"
+  METHOD_STATUS="Error"
+fi
+
+# ------------------------------------------------------------------- 
+# Stop the Queue Manager, using script from MQ V7
+#
+echo "hamqsi_stop_broker_as: Stop Queue Manager $QM"
+su $MQUSER -c "/MQHA/bin/hamqm_stop_su $QM $TIMEOUT"
+if [ $? -ne "0" ]
+then
+  # Even if the above operation failed, just report and then continue by 
+  # stopping other components
+  echo "hamqsi_stop_broker_as: Attempt to stop queue manager $QM failed"
+  METHOD_STATUS="Error"
+fi
+
+if [ ${METHOD_STATUS} = "OK" ]
+then
+  exit 0
+else
+  echo "hamqsi_stop_broker_as: Completed with errors"
+  exit 1
+fi

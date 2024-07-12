@@ -1,0 +1,206 @@
+#!/bin/bash
+
+#################################
+#	Set Variables		#
+#################################
+
+# ==> If you want to specify a default path, set MTE_AGENT_PATH described below.
+MTE_AGENT_PATH=/MQHA/mte/mteagent
+
+
+MTE_AGENT_CONFIG_FILE=config.ini
+MTE_AGENT_BIN=${MTE_AGENT_PATH}/bin
+
+export LIBPATH=./lib:$LIBPATH
+export SHLIB_PATH=./lib:$SHLIB_PATH
+export LD_LIBRARY_PATH=./lib:$LD_LIBRARY_PATH
+#export PATH=$PATH:.
+
+cd $MTE_AGENT_PATH
+
+#################################
+#	Sub Functions		#
+#################################
+Sts_dsp_agent()
+{
+Sts_chk_agent
+STATUS=$?
+
+case $STATUS in
+	1)
+	echo "\nMTE Control Center Agent Status: Stopped"
+	STATUS="1"
+	;;
+	-1)
+	echo "\nMTE Control Center Agent Status: Overlapped"
+	STATUS="-1"
+	;;
+	0)
+	echo "\nMTE Control Center Agent Status: Running"
+	STATUS="0"
+	;;
+	*)
+	echo "\nMTE Control Center Agent Status: Abnormal"
+	STATUS="-1"
+	break;;
+esac
+}
+
+Sts_chk_agent()
+{
+if [ ` ps -ef | grep -v grep | grep -v $0 | grep ${MTE_AGENT_BIN}/mte_agent | wc -l ` -eq 0 ]
+then
+	return 1 #Stopped
+else
+	if [ ` ps -ef | grep -v grep | grep -v $0 | grep ${MTE_AGENT_BIN}/mte_agent| wc -l ` -eq 1 ]
+	then
+		return 0 #Running
+	else
+		return -1 #Overlapped
+	fi
+fi
+}
+
+Start_agent()
+{
+Sts_chk_agent
+if [ $? -eq 1 ]
+then
+${MTE_AGENT_BIN}/mte_agent ${MTE_AGENT_PATH}/${MTE_AGENT_CONFIG_FILE}
+else
+	Sts_chk_agent
+	if [ $? -eq 0 ]
+	then
+		echo MTE Control Center Agent is already running now.
+	else
+		echo MTE Control Center Agent ended abnormally.
+		echo Restarting MTE Control Center Agent..
+		Restart_agent
+	fi
+fi
+}
+
+Stop_agent()
+{
+ps -ef | grep -v grep | grep -v $0 | grep ${MTE_AGENT_BIN}/mte_agent |awk '{print "kill", $2}' | sh -v >/dev/null 2>&1
+}
+
+Restart_agent()
+{
+Stop_agent
+sleep 1
+Start_agent
+}
+
+#########################################
+#	Main Program			#
+#########################################
+SCRIPT=$0
+
+	case $1 in
+		start)
+		echo "####################################################"
+		echo "#        MTE Control Center Agent                  #"
+		echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+		echo "####################################################"
+
+		echo "####################################################"
+		echo "#         Start MTE Control Center Agent           #"
+		echo "####################################################"
+		echo `date` Starting MTE Control Center Agent..
+		
+		Start_agent
+		sleep 1
+		Sts_dsp_agent
+		if [ $STATUS -eq 0 ]
+		then
+			return 0
+		else
+			if [ $STATUS -eq -1 ]
+			then
+				return 10
+			else
+				return 20
+			fi
+		fi
+		;;
+		stop)
+		echo "####################################################"
+		echo "#        MTE Control Center Agent                  #"
+		echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+		echo "####################################################"
+
+		echo "####################################################"
+		echo "#         Stop MTE Control Center Agent            #"
+		echo "####################################################"
+		echo `date` Stopping MTE Control Center Agent..
+		
+		Stop_agent
+		sleep 1
+		Sts_dsp_agent
+		if [ $STATUS -eq 0 ]
+		then
+			return 20
+		else
+			if [ $STATUS -eq -1 ]
+			then
+				return 10
+			else
+				return 0
+			fi
+		fi
+		;;
+		status)
+		echo "####################################################"
+		echo "#        MTE Control Center Agent                  #"
+		echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+		echo "####################################################"
+
+		echo "####################################################"
+		echo "#     Status Process MTE Control Center Agent      #"
+		echo "####################################################"
+		echo `date` Showing MTE Control Center Agent Status
+		
+		Sts_dsp_agent
+		if [ $STATUS -eq 0 ]
+		then
+			return 0
+		else
+			if [ $STATUS -eq -1 ]
+			then
+				return 10
+			else
+				return 20
+			fi
+		fi
+		;;
+		restart)
+		echo "####################################################"
+		echo "#        MTE Control Center Agent                  #"
+		echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+		echo "####################################################"
+
+		echo "####################################################"
+		echo "#         Restart MTE Control Center Agent         #"
+		echo "####################################################"
+		echo `date` Restarting MTE Control Center Agent..
+		
+		Restart_agent
+		sleep 1
+		Sts_dsp_agent
+		if [ $STATUS -eq 0 ]
+		then
+			return 0
+		else
+			if [ $STATUS -eq -1 ]
+			then
+				return 10
+			else
+				return 20
+			fi
+		fi
+		;;
+		*)
+		echo "Usage : $0 [ 'start' | 'stop' | 'status' | 'restart' ]"
+		break;;
+	esac

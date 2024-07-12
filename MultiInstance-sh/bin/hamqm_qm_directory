@@ -1,0 +1,101 @@
+#!/bin/bash
+# @(#) public/hacmp/hamqm_qm_directory, supportpacs, MQHA          1.2  00/11/08 09:57:13
+#
+# (C) Copyright IBM Corporation 2000
+#
+# MC63: MQSeries for AIX - Implementing with HACMP
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   /MQHA/bin/hamqm_qm_directory <qmname>
+# Accepts the name of a QM and returns (prints) the fully qualified
+# path of the (mangled) QM directory for that QM.
+#
+
+NAME_TO_FIND=$1
+
+# The regular expression in the next line contains a tab character
+# Edit only with tab-friendly editors.
+cat /var/mqm/mqs.ini | grep -v "^[ 	]*#" | \
+  awk -F= -v name_to_find=$NAME_TO_FIND  \
+  ' BEGIN {
+      in_qmstanza="no";
+      correct_stanza="no";
+      name="not set";
+      prefix="not set";
+      directory="not set";
+    }
+
+  # body
+  {
+    if (in_qmstanza=="no" && $1=="QueueManager:")
+    {
+      in_qmstanza="yes";
+    }
+    else if (in_qmstanza=="yes")
+    {
+      if ($1=="   Name")
+      {
+        #print "found name "$2
+        name=$2;
+      }
+      if ($1=="   Prefix")
+      {
+        #print "found prefix "$2
+        prefix=$2;
+      }
+      if ($1=="   Directory")
+      {
+        #print "found directory "$2
+        directory=$2;
+      }
+      if ( match($1,"[.]*:$") )   # start of a stanza
+      {
+        if (name==name_to_find)
+        {
+          result=sprintf("%s/qmgrs/%s",
+          prefix,directory);
+          #print "result set to "result
+        }
+        if ($1=="QueueManager:")
+        {
+          in_qmstanza="yes";
+          name="not set";
+          prefix="not set";
+          directory="not set";
+        }
+        else
+        {
+          in_qmstanza="no";
+          name="not set";
+          prefix="not set";
+          directory="not set";
+        }
+      }
+    }
+  }
+  END {
+    if (in_qmstanza=="yes")
+    {
+      if (name==name_to_find)
+      {
+        result=sprintf("%s/qmgrs/%s",prefix,directory);
+        #print "result set to "result
+      }
+    }
+    if (result!="not set")
+    {
+      print result;
+    }
+    else
+    {
+      print "not found";
+    }
+  }
+  '

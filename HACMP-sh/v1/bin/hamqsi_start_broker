@@ -1,0 +1,88 @@
+#!/bin/ksh
+# Module:
+#   hamqsi_start_broker
+#
+# Args:
+#   BROKER = name of broker to start
+#
+# Description:
+#   This script attempts to start the MQSI Broker
+#
+#   Runs as the userid which runs broker, and must have 
+#   the user's environment (i.e. invoke from "su - $MQUSER ..")
+#
+
+BROKER=$1
+
+if [ -z "$BROKER" ]
+then
+  echo "hamqsi_start_broker: ERROR! No Broker name supplied"
+  echo "   Usage: hamqsi_start_broker <BROKER>" 
+  exit 1
+fi
+
+# Ensure that the broker is not already running. In this test
+# we look for any broker-related processes, which might have
+# been left around after a previous failure. Any that remain
+# must now be terminated. This is a brutal means of mopping 
+# up broker processes.
+# We stop the processes in the following order:
+#   bipservice       - first so it cannot issue restarts
+#   bipbroker        - next for same reason
+#   biphttplistener
+#   DataFlowEngines  - last
+#
+echo "hamqsi_start_broker: Ensure $BROKER not already running"
+for process in bipservice bipbroker biphttplistener DataFlowEngine
+do
+  # Output of kill redirected to /dev/null in case no processes
+  ps -ef | grep "$process $BROKER" | grep -v grep | \
+     awk '{print $2}'| xargs kill -9 > /dev/null 2>&1
+done
+
+
+# Start the Broker 
+echo "hamqsi_start_broker: Start Broker " $BROKER
+mqsistart $BROKER > /dev/null 2>&1
+if [ $? -ne "0" ]
+then 
+  echo "hamqsi_start_broker: Bad result from mqsistart for $BROKER"
+  exit 1
+fi
+
+# Check to see if the broker service has started. This loop 
+# uses a fixed online timeout of approx. 10 seconds.
+TIMED_OUT=yes
+i=0
+while [ $i -lt 10 ]
+do
+  # Check for Broker start. We look for bipservice and 
+  # bipbroker to be running; there might be no message flows
+  # deployed.
+  # Look to see whether bipservice is running
+  cnt=`ps -ef | grep "bipservice $BROKER" | grep -v grep | wc -l`
+  if [ $cnt -gt 0 ]
+  then
+    # Look to see whether bipbroker is running
+    cnt=`ps -ef | grep "bipbroker $BROKER" | grep -v grep | wc -l`
+    if [ $cnt -gt 0 ]
+    then
+      # Broker is online
+      echo "hamqsi_start_broker: ${BROKER} is running"
+      TIMED_OUT=no
+      break  # out of timing loop
+    fi
+  fi
+  # Manage the loop counter
+  i=`expr $i + 1`
+  sleep 1
+done
+
+# Report error if broker failed to start in time
+if [ ${TIMED_OUT} = "yes" ]
+then 
+  echo "hamqsi_start_broker: Broker service failed to start: " $BROKER
+  exit 1
+fi
+
+exit 0

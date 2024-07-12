@@ -1,0 +1,115 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module:
+#   hamqsi_qm_datapath
+#
+# Parameters:
+#   QM  = name of queue manager whose data path is 
+#         to be found.
+#
+# Description:
+#   Accepts the name of a QM and returns (prints) the fully 
+#   qualified path of the directory which contains the qmgrs
+#   directory for that QM.
+#
+#   This script is used by other hamqsi scripts and is not 
+#   called directly by users or HACMP.
+
+NAME_TO_FIND=$1
+
+# The regular expression in the next line contains a tab character
+# Edit only with tab-friendly editors.
+cat /var/mqm/mqs.ini | grep -v "^[ 	]*#" | \
+  nawk -F= -v name_to_find=$NAME_TO_FIND  \
+  ' BEGIN {
+      in_qmstanza="no";
+      correct_stanza="no";
+      name="not set";
+      prefix="not set";
+      directory="not set";
+    }
+
+  # body
+  {
+    if (in_qmstanza=="no" && $1=="QueueManager:")
+    {
+      in_qmstanza="yes";
+    }
+    else if (in_qmstanza=="yes")
+    {
+      if ($1=="   Name")
+      {
+        #print "found name "$2
+        name=$2;
+      }
+      if ($1=="   Prefix")
+      {
+        #print "found prefix "$2
+        prefix=$2;
+      }
+      if ($1=="   Directory")
+      {
+        #print "found directory "$2
+        directory=$2;
+      }
+      if ( match($1,"[.]*:$") )   # start of a stanza
+      {
+        if (name==name_to_find)
+        {
+          result=sprintf("%s",prefix);
+          #print "result set to "result
+        }
+        if ($1=="QueueManager:")
+        {
+          in_qmstanza="yes";
+          name="not set";
+          prefix="not set";
+          directory="not set";
+        }
+        else
+        {
+          in_qmstanza="no";
+          name="not set";
+          prefix="not set";
+          directory="not set";
+        }
+      }
+    }
+  }
+  END {
+    if (in_qmstanza=="yes")
+    {
+      if (name==name_to_find)
+      {
+        result=sprintf("%s",prefix);
+        #print "result set to "result
+      }
+    }
+    if (result!="not set")
+    {
+      print result;
+    }
+    else
+    {
+      print "not found";
+    }
+  }
+  '
+
+
+
+

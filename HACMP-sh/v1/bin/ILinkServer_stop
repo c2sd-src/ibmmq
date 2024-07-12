@@ -1,0 +1,65 @@
+#!/usr/bin/ksh
+# ILink stop script.
+# This script execute shutdown ILinkServer command only
+# Not include stop manager command.
+
+cnt=$#
+USER_ID=`whoami`
+ILinkSERVERPORT=`cat ILinkServerStartUp.xml | grep '\<ListeningPort' | sed 's/[^0-9]//g'`
+if [ $cnt -eq 0 ];
+then
+  USER_HOME=${HOME}
+else
+  USER_HOME=$1
+fi
+
+#. ${USER_HOME}/.profile
+
+cnt=`env | grep ILinkHome | grep -v grep | wc -l`
+
+#if [ $cnt -eq 0 ];
+#then
+#  export ILinkHome=${USER_HOME}/mi/ilink
+#
+#  echo "ILinkHome path was not found."
+#  echo "Now ILinkHome=${ILinkHome}"
+#fi
+
+export ILinkHome=/mqm/data/mi/ilink
+
+cd $ILinkHome
+
+if [ -f ILinkCon ]
+then
+  echo "ILinkCon file exist."
+  echo "Now shutdown ILinkServer"
+else
+  echo "ILinkCon file not exist."
+  echo "This path was wrong..."
+  echo "Exit script."
+  exit
+fi
+
+echo "shutdown
+exit"| ILinkCon localhost ${ILinkSERVERPORT}
+
+i=0
+cnt=`ps -ef | grep ILink | grep ${USER_ID}| grep -v grep  | grep -e ILinkServer -e ILinkTriggerMonitor -e ILinkQManager | wc -l`
+
+while [ $cnt -gt 0 ]
+do
+  if [ $i -ge 30 ];
+  then
+    echo "ILink Server will be terminated.\n"
+    kill -9 `ps -ef|grep ILink  | grep ${USER_ID}|grep -v grep |grep -v .log |grep -e ILinkServer -e ILinkTriggerMonitor -e ILinkQManager | awk '{print $2}'`
+  else
+    i=`expr $i + 1`
+    echo "ILink Server stopping...\n"
+    sleep 1
+  fi
+
+  cnt=`ps -ef | grep ILink  | grep ${USER_ID}| grep -v grep  | grep -e ILinkServer -e ILinkTriggerMonitor -e ILinkQManager | wc -l`
+done
+
+echo "MI ILink shutdown complete!\n"
+

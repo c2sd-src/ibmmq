@@ -1,0 +1,57 @@
+#!/bin/ksh
+#Global Variable
+MQUSER=mqm
+BKUSER=mqsi
+QMNAME=EAIBK3P
+BKNAME=EAIBK3P
+MQEQM=GW31
+
+MQHA_BIN=/MQHA/bin
+
+#MQ, WMQI, DB2 start
+echo "$QMNAME EAI Component Stating(WMB, WMQ, DB2 instance)"
+#$MQHA_BIN/hamqsi_start_broker_as $BKNAME $QMNAME $BKUSER $DBINST $DBNAME 
+$MQHA_BIN/hamqsi_start_broker_as $BKNAME $QMNAME $MQUSER $BKUSER
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start $QMNAME EAI Component"
+  exit $rc
+fi
+
+#WMQ Channel start
+echo "\n$QMNAME Channel Starting"
+su $MQUSER -c "$MQHA_BIN/hamqm_chl $QMNAME start"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start $QMNAME Channel"
+  exit $rc
+fi
+
+
+#MQ Trigger Monitor Start
+#echo "\n[$QMNAME] Trigger Monitor starting"
+#su $MQUSER -c "/MQHA/bin/hamqm_trm $QMNAME start"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start WMQ Trigger Monitor"
+#  exit $rc
+#fi
+
+#Waitting for starting MQ
+#sleep 120
+
+#MQe Gateway start
+#echo "\nMQe Gateway Starting."
+#su $MQUSER -c "$MQHA_BIN/hamqe_op $MQEQM start $QMNAME"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start MQe Gateway" 
+#  exit $rc
+#fi
+
+
+exit 0

@@ -1,0 +1,106 @@
+#!/bin/ksh
+MQE_PATH=/var/mqm/MQeTest
+MQE_SCRIPT_PATH=/var/mqm/MQeTest/ServerSupport/mqe_script/jars
+MQEUSER=mqm
+
+if [ `whoami` != $MQEUSER ]
+then
+  echo "Need to be running as $MQEUSER user"
+  exit 1
+fi
+
+QMGR=$1
+LOAD="mqe_script_qm -load -inifile ${MQE_PATH}/qmgrs/${QMGR}.ini"
+SOURCE="source ${MQE_PATH}/qmgrs/OBJ_LIST/${QMGR}/$3"
+
+SCRIPT=$0
+
+        case $2 in
+                create)
+                if [ -z "$3" ]
+                then
+                   echo "No MQe Object Script file supplied"
+                   echo "  Usage: hamqe_op <QMNAME> create <MQe Object Script file>"
+                   exit 1
+                fi
+                echo "#####################################"
+                echo "# Create MQe Gateway Objects-$QMGR  #"
+                echo "#####################################"
+                echo `date` $SCRIPT Creating MQe Gateway Objects-$QMGR
+                ${MQE_SCRIPT_PATH}/mqe_scripts.sh "${SOURCE}" 1>>${MQE_PATH}/errors/MQE_INFO.log 2>>\
+                ${MQE_PATH}/errors/MQE_ERR.log & 
+                sleep 5
+                #ps -ef |grep -v grep | grep $MQEUSER | grep java | grep "${SOURCE}" |\
+                #                       awk '{print "kill -9", $2}' | sh -v >/dev/null 2>&1 
+                if [ `ps -ef | grep -v grep | grep $MQEUSER | grep java | grep "${LOAD}" | wc -l` = "0" ]
+                then
+                        echo "\nMQe Gateway Status: ${QMGR} Stopped"
+                else
+                        echo "\nMQe Gateway Status: ${QMGR} Running"
+                fi
+
+                ;;
+
+                start)
+                if [ -z "$3" ]
+                then
+                   echo "No WMQ QManager Name supplied"
+                   echo " Usage: hamqe_op <QMNAME> start <WMQ_QMGR_NAME>"
+                   exit 1
+                fi
+ 
+                WMQ_QMGR_ALIVE=`echo "ping qmgr" | runmqsc $3 | grep ping | awk '{print $1}'`
+ 
+                if [ "$WMQ_QMGR_ALIVE" != "1" ]
+                then
+                   echo "Could not start the WMQ QManager($3)"
+                   exit 1
+                fi
+                echo "############################"
+                echo "# Start MQe Gateway-$QMGR  #"
+                echo "############################"
+                echo `date` $SCRIPT starting MQe Gateway-$QMGR
+                ${MQE_SCRIPT_PATH}/mqe_scripts.sh "${LOAD}" 1>>${MQE_PATH}/errors/MQE_INFO.log 2>>\
+                ${MQE_PATH}/errors/MQE_ERR.log &
+                sleep 5
+                if [ `ps -ef | grep -v grep | grep $MQEUSER | grep java | grep "${LOAD}" | wc -l` = "0" ]
+                then
+                        echo "\nMQe Gateway Status: ${QMGR} Stopped"
+                else
+                        echo "\nMQe Gateway Status: ${QMGR} Running"
+                fi
+
+                ;;
+
+                stop)
+                echo "############################"
+                echo "# Stop MQe Gateway-$QMGR   #"
+                echo "############################"
+                echo `date` $SCRIPT stopping MQe Gateway-$QMGR
+                ps -ef |grep -v grep | grep $MQEUSER | grep java | grep "${LOAD}" |\
+                                       awk '{print "kill -9", $2}' | sh -v >/dev/null 2>&1
+                sleep 5
+                if [ `ps -ef | grep -v grep | grep $MQEUSER | grep java | grep "${LOAD}" | wc -l` = "0" ]
+                then
+                        echo "\nMQe Gateway Status: ${QMGR} Stopped"
+                else
+                        echo "\nMQe Gateway Status: ${QMGR} Running"
+                fi
+                ;;
+
+
+                status)
+                echo "#############################"
+                echo "# Status MQe Gateway-$QMGR  #"
+                echo "#############################"
+                if [ `ps -ef | grep -v grep | grep $MQEUSER | grep java | grep "${LOAD}" | wc -l` = "0" ]
+                then
+                        echo "\nMQe Gateway Status: ${QMGR} Stopped"
+                else
+                        echo "\nMQe Gateway Status: ${QMGR} Running"
+                fi
+                ;;
+                *) echo "Usage $0 [QMGR Name] create|start|stop|status"
+                break;;
+        esac
+return 0

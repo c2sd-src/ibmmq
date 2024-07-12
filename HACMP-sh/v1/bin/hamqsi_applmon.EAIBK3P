@@ -1,0 +1,2 @@
+#!/bin/ksh
+/MQHA/bin/hamqsi_monitor_broker_as EAIBK3P EAIBK3P EAIBK3DB mqsi

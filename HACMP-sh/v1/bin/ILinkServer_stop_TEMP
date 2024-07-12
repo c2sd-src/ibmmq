@@ -1,0 +1,38 @@
+#!/usr/bin/ksh
+# ILink stop script.
+# This script execute shutdown ILinkServer command only
+# Not include stop manager command.
+
+userN=mqm
+count=1
+retryCount=5
+ILinkServerPort=9998
+
+echo "[ ILinkServer ] Stop script starting"
+
+while [ $count -le $retryCount ]
+do
+ ServerOnOff=`ps -ef | grep ILinkServer | grep $ILinkHome | grep $userN | grep -v grep | wc -l`
+ if [ $ServerOnOff -lt 1 ]; then
+echo "|-[ ILinkServer ] try($count) : status check ..Stopped"
+
+break
+ else
+if [ $count -eq $retryCount ]; then
+   echo "|-[ ILinkServer ] Script Terminated. check Agent log.."
+ exit 1
+fi
+  echo "|-[ ILinkServer ] try($count) : status check ..Running"
+  #ILinkServer Stopping
+  echo "shutdown
+    exit " | $ILinkHome/ILinkCon 127.0.0.1 $ILinkServerPort > /dev/null 2>&1 
+  count=$(($count + 1 ))
+ fi
+ sleep 4
+done
+
+echo "[ ILinkServer ] Stopped"
+echo ""
+fi  ## directory check
+
+echo "MI ILink shutdown complete!\n"

@@ -1,0 +1,179 @@
+#!/bin/ksh
+# @(#) public/hacmp/hamqm_stop_su, supportpacs, MQHA          1.7  07/12/03 15:51:54
+#
+# (C) Copyright IBM Corporation 2000,2008
+#
+# MC63: MQSeries for AIX - Implementing with HACMP
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   ${HASCRIPT_DIR}/bin/subscript/hamqm_stop_su <qmname> <timeout-secs>
+#
+# Stops the QM. If no timeout has been provided ($2) then the
+# endmqm is issued synchronously and this script blocks until it
+# has completed. If a timeout is provided, this script uses a 
+# phased approach to stopping the QM - each phase is given 
+# timeout-secs to complete and is then escalated to the next 
+# phase. The first phase uses "immediate", the next uses 
+# "preemptive", and the third (and final) phase uses kill -9 on 
+# the QM processes.
+#
+# Run this script as the userid that should control the QM. e.g.
+# su - mqm -c /usr/sbin/cluster/utils/hamqm_stop_su <qmname>
+
+QM=$1
+TIMEOUT=$2
+
+if [ -z "$QM" ]
+then
+  echo "hamqm_stop: ERROR! No queue manager name supplied"
+  exit 1
+fi
+
+if [ -z "$TIMEOUT" ]
+then
+  echo "hamqm_stop: ERROR! No timeout specified"
+  exit 1
+fi
+
+echo "hamqm_stop_su is running: \"$QM\"  $TIMEOUT"
+
+# Check to see if the QM is already stopped. If so, just make
+# sure no processes are lying around.
+#
+online=`${HASCRIPT_DIR}/bin/subscript/hamqm_running ${QM}`
+if [ ${online} != "1" ]
+then
+  # QM is reported as offline; ensure no processes remain
+
+  # Note that this whole script should be executed under su,
+  # which is why there's no su in the following loop.
+  #
+
+  # The regular expression in the next line contains a tab character
+  # Edit only with tab-friendly editors.
+  srchstr="( |-m)$QM[ 	]*.*$"
+  for process in `cat ${HASCRIPT_DIR}/bin/subscript/hamqproc`              
+  do
+    ps -ef | grep $process | grep -v grep | \
+       egrep "$srchstr" | awk '{print $2}'| \
+         xargs kill -9
+  done
+  exit 0
+fi
+
+# Invoke Pre-Offline user exit, if one exists
+if [ -x ${HASCRIPT_DIR}/bin/subscript/rc.local ]
+then
+  echo "hamqm_stop_su: launch pre-offline script for ${QM}"
+  ${HASCRIPT_DIR}/bin/subscript/rc.local ${QM} pre_offline &
+  # Exit code from pre_offline script is deliberately ignored
+fi
+
+for severity in immediate preemptive terminate
+do
+  # Issue the stop method in the background - we don't
+  # want to risk having it hang us up, indefinitely. We
+  # want to be able to run our TIMEOUT timer at
+  # the same time to give up on the attempt, and try a
+  # more forceful version. If the kill version fails then
+  # there is nothing more we can do here anyway.
+  
+  echo "hamqm_stop_su: attempting ${severity} stop of ${QM}"
+  case $severity in
+
+  immediate)
+    # Minimum severity of stop is an Immediate stop
+    # i.e. we sever connections - HACMP should not be delayed
+    # by clients
+    endmqm -i ${QM} &
+    ;;
+
+  preemptive)
+    # This is a preemptive stop. We have already tried -i.
+    endmqm -p ${QM} &
+    ;;
+
+  terminate)
+    # This is a brutal means of mopping up QM processes.
+
+    # The regular expression in the next line contains a tab character
+    # Edit only with tab-friendly editors.
+    srchstr="( |-m)$QM[ 	]*.*$"
+    for process in `cat ${HASCRIPT_DIR}/bin/subscript/hamqproc`              
+    do
+      ps -ef | grep $process | grep -v grep | \
+         egrep "$srchstr" | awk '{print $2}'| \
+            xargs kill -9
+    done
+
+  esac
+
+
+  echo "hamqm_stop_su: waiting for ${severity} stop of ${QM} to complete"
+  TIMED_OUT=yes
+  SECONDS=0
+  while (( $SECONDS < ${TIMEOUT} ))
+  do
+    # Invoke hamqm_running utility
+    online=`${HASCRIPT_DIR}/bin/subscript/hamqm_running ${QM}`
+    case $online in
+
+      "1")    
+        # It's still running...wait for timeout
+        ;;
+
+      "0")
+        # EC has updated status, but wait for
+        # EC to cleanup and terminate. If it
+        # fails to terminate inside 10 secs
+        # then escalate to next level of
+        # stop processing.
+        echo "hamqm_stop_su: ${QM} is stopping"
+        TIMED_OUT=yes
+        i=0
+        while [ $i -lt 10 ]
+        do
+          # Check for EC termination
+          # The regular expression in the next line contains a tab character
+          # Edit only with tab-friendly editors.
+          srchstr="( |-m)$QM[ 	]*.*$"
+          cnt=`ps -ef | grep amqzxma0 | grep -v grep | \
+            egrep "$srchstr" | awk '{print $2}' | wc -l `
+          i=`expr $i + 1`
+          sleep 1
+          if [ $cnt -eq 0 ]
+          then
+            TIMED_OUT=no
+            break
+          fi
+        done
+        break
+        ;;
+
+      *)  
+        # Bad result from hamqm_running
+        echo "hamqm_stop_su: invalid result (${online}) from hamqm_running"
+        exit 1
+        break
+        ;;
+    esac
+
+    sleep 1
+
+  done # timeout loop
+
+  if [ ${TIMED_OUT} = "yes" ]
+  then
+    continue        # to next level of urgency
+  else
+    break           # instance is stopped, job is done
+  fi
+
+done # next phase of stop

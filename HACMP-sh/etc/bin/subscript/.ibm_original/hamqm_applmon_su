@@ -1,0 +1,67 @@
+#!/bin/ksh
+# @(#) public/hacmp/hamqm_applmon_su, supportpacs, MQHA          1.2  00/11/07 18:16:49
+#
+# (C) Copyright IBM Corporation 2000
+#
+# MC63: MQSeries for AIX - Implementing with HACMP
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   ${HASCRIPT_DIR}/bin/subscript/hamqm_applmon_su <qmname>
+# This is the application monitor script used with HACMP/ES.
+#
+# This script tests the operation of the QM, by performing a ping.
+# HACMP/ES invokes this script via the hamqm_applmon.$qmgr script,
+# under the userid that controls the QM. 
+# e.g. su - mqm -c ${HASCRIPT_DIR}/bin/subscript/hamqm_applmon_su $qmgr
+#
+# Exit codes:
+# 0  => Either QM is starting or QM is running and responds. 
+#       Either is OK.
+# >0 => QM is not responding and not starting.
+#       Exit code is result of runmqsc command.
+
+QM=$1
+
+
+# Test the operation of the QM.
+echo "ping qmgr" | runmqsc ${QM} > /dev/null 2>&1
+pingresult=$?
+# pingresult will be 0 on success; non-zero on error (man runmqsc)
+
+if [ $pingresult -eq 0 ]
+then # ping succeeded
+
+  echo "hamqm_applmon: Queue Manager ${QM} is responsive"
+  result=0
+
+else # ping failed
+
+  # Don't condemn the QM immediately, it may be in startup.
+  # The following regexp includes a space and a tab, so use tab-friendly
+  # editors.
+  srchstr=" $QM[	 ]*$"
+  cnt=`ps -ef | grep strmqm | grep "$srchstr" | grep -v grep \
+                | awk '{print $2}' | wc -l`
+  if [ $cnt -gt 0 ]
+  then
+    # It appears that QM is still starting up, tolerate
+    echo "hamqm_applmon: Queue Manager ${QM} is starting"
+    result=0
+  else
+    # There is no sign of QM start process
+    echo "hamqm_applmon: Queue Manager ${QM} is not responsive"
+    result=$pingresult
+  fi
+
+fi
+
+exit $result
+
+

@@ -1,0 +1,350 @@
+#!/bin/ksh
+############################################################################
+# @(#) public/ibm/mq, Operation, Utility 1.0  2011/09/26 16:20 KST.
+#
+# (C) Copyright C2SD Foundation. 2011
+#
+# MQ DQM Channel Operation Utility
+#
+# DESCRIPTION:
+#   ${UTIL_BIN}/mqch_op [QMGRNAME] [CommandOpts] [CHLNAME]
+#
+# IBM MQ DQM채널에 대한 운용 스크립트
+# 지정한 QMGR의 송신/서버 채널의 START/STOP 및 채널의 상태확인 가능
+#
+# HA환경 등의 이유로 root상에서는 'mqm'계정으로 'SU'해서 사용가능
+# ex) su mqm -c "${UTIL_BIN}/mqch_op [QMGR NAME] start"
+############################################################################
+
+#-----------------------------------------------------------#
+# Define Variable                                           #
+# System 환경에 맞게 아래 변수 값을 재설정 한다.            #
+#-----------------------------------------------------------#
+USER="mqm75"
+BASE_PGM=`basename $0`
+QMGR=$1
+CMD=$2
+CHLNAME=$3
+
+#-----------------------------------------------------------#
+# CHANNEL LIST                                              #
+#-----------------------------------------------------------#
+SDRCHL_LST=`echo "dis chl(*)" | runmqsc ${QMGR} | grep "CHLTYPE(SDR)" | \
+						grep -v "SYSTEM" | cut -f 2 -d "(" | cut -f 1 -d ")" | awk -F" " '{print $1}'`
+SVRCHL_LST=`echo "dis chl(*)" | runmqsc ${QMGR} | grep "CHLTYPE(SVR)" | \
+						grep -v "SYSTEM" | cut -f 2 -d "(" | cut -f 1 -d ")" | awk -F" " '{print $1}'`
+RCVCHL_LST=`echo "dis chl(*)" | runmqsc ${QMGR} | grep "CHLTYPE(RCVR)" | \
+						grep -v "SYSTEM" | cut -f 2 -d "(" | cut -f 1 -d ")" | awk -F" " '{print $1}'`
+RQTCHL_LST=`echo "dis chl(*)" | runmqsc ${QMGR} | grep "CHLTYPE(RQSTR)" | \
+						grep -v "SYSTEM" | cut -f 2 -d "(" | cut -f 1 -d ")" | awk -F" " '{print $1}'`
+
+#-----------------------------------------------------------#
+# status channel                                            #
+#-----------------------------------------------------------#
+print_status_allchl()
+{
+	echo "----------------------------------------------------"
+	echo ">> Status MQ DQM CHANNEL                            "
+	echo "----------------------------------------------------"
+		
+	echo "\nCHANNEL STATUS (SENDER)"
+	for sdrchl in ${SDRCHL_LST}
+	do
+		echo "\t"${sdrchl}" \t: " \
+		`echo "dis chs(${sdrchl}) status" | runmqsc ${QMGR} | grep STATUS \
+                                      	| cut -f 3 -d "(" | cut -f 1 -d ")"`
+	done
+	
+	echo "\nCHANNEL STATUS (SERVER)"
+	for svrchl in ${SVRCHL_LST}
+	do
+		echo "\t"${svrchl}" \t: " \
+		`echo "dis chs(${svrchl}) status" | runmqsc ${QMGR} | grep STATUS \
+	                                      	| cut -f 3 -d "(" | cut -f 1 -d ")"`
+	done
+	
+	echo "\nCHANNEL STATUS (RECEIVER)"
+	for rcvrchl in ${RCVCHL_LST}
+	do
+		echo "\t"${rcvrchl}" \t: " \
+		`echo "dis chs(${rcvrchl}) status" | runmqsc ${QMGR} | grep STATUS \
+	                                      	| cut -f 3 -d "(" | cut -f 1 -d ")"`
+	done
+	
+	echo "\nCHANNEL STATUS (REQUESTOR)"
+	for rqtchl in ${RQTCHL_LST}
+	do
+		echo "\t"${rqtchl}" \t: " \
+		`echo "dis chs(${rqtchl}) status" | runmqsc ${QMGR} | grep STATUS \
+	                                      	| cut -f 3 -d "(" | cut -f 1 -d ")"`
+	done
+}
+
+get_chl_status()
+{
+	chlname=$1
+	CHL_STATUS=`echo "dis chs(${chlname}) status" | runmqsc $QMGR | grep STATUS \
+						| cut -f 3 -d "(" | cut -f 1 -d ")"`
+
+	if [ "${CHL_STATUS}" = "RUNNING" ]
+	then
+		return 0 #RUNNING
+	elif [ "${CHL_STATUS}" = "STOPPED" ]
+	then
+		return 1 #STOPPED
+	else
+		return 2 #UNKNOWN(INACTIVE)
+	fi
+}
+
+#-----------------------------------------------------------#
+# start channel                                             #
+#-----------------------------------------------------------#
+start_chl()
+{
+	chlname=$1
+	get_chl_status ${chlname}
+	case $? in
+		0)
+		echo "CHANNEL(${chlname}) \t STATUS(RUNNING) \t (already running)"
+		;;
+		1)
+		echo "CHANNEL(${chlname}) \t STATUS(STOPPED) \t (invoke skip)"
+		;;
+		*)
+		echo "CHANNEL(${chlname}) \t STATUS(INACTIVE) \t (starting)"
+		echo "start chl(${chlname})" | runmqsc ${QMGR} | grep -i ${chlname}
+		break;;
+	esac
+}
+
+start_all_chl()
+{
+	CHLLIST="$1"
+	for chl in ${CHLLIST}
+	do
+		start_chl ${chl}
+	done
+}
+
+#-----------------------------------------------------------#
+# stop channel                                              #
+#-----------------------------------------------------------#
+stop_chl()
+{
+	chlname=$1
+	get_chl_status ${chlname}
+	case $? in
+		0)
+		echo "CHANNEL(${chlname}) \t STATUS(RUNNING) \t (stopping)"
+		echo "stop chl(${chlname}) status(inactive)" | runmqsc $QMGR | grep -i ${chlname}
+		;;
+		1)
+		echo "CHANNEL(${chlname}) \t STATUS(STOPPED) \t (already stopped)"
+		;;
+		*)
+		echo "CHANNEL(${chlname}) \t STATUS(INACTIVE) \t (already inactive)"
+		echo "stop chl(${chlname}) status(inactive)" | runmqsc $QMGR | grep -i ${chlname}
+		break;;
+	esac
+}
+
+stop_all_chl()
+{
+	CHLLIST="$1"
+	for chl in ${CHLLIST}
+	do
+		stop_chl ${chl}
+	done
+}
+
+#-----------------------------------------------------------#
+# resolve channel                                           #
+#-----------------------------------------------------------#
+resolve_chl()
+{
+	chlname=$1
+	echo "resolve chl(${chlname}) action(backout)" | runmqsc $QMGR | grep -i ${chlname}
+}
+
+resolve_all_chl()
+{
+	CHLLIST="$1"
+	for chl in ${CHLLIST}
+	do
+		resolve_chl ${chl}
+	done
+}
+
+#-----------------------------------------------------------#
+# reset channel                                             #
+#-----------------------------------------------------------#
+reset_chl()
+{
+	chlname=$1
+	echo "reset chl(${chlname})" | runmqsc $QMGR | grep -i ${chlname}
+}
+
+reset_all_chl()
+{
+	CHLLIST="$1"
+	for chl in ${CHLLIST}
+	do
+		reset_chl ${chl}
+	done
+}
+
+#-----------------------------------------------------------#
+# etc                                                       #
+#-----------------------------------------------------------#
+chk_arg_chlname()
+{
+	if [ -z "${CHLNAME}" ]
+	then
+		print_usage
+		exit 1
+	fi
+}
+
+print_usage()
+{
+	echo "USAGE: ${BASE_PGM} [QMGRNAME] [CommandOpts] [CHLNAME]"
+	echo "Command Opts: [startALL|start|stopALL|stop|restartALL|restart|recoveryALL|recovery|status]"
+}
+
+print_title()
+{
+	echo "####################################################"
+	echo "#         IBM MQ DQM Channel Operation Tool   	   #"
+	echo "####################################################"
+}
+
+#-----------------------------------------------------------#
+# START: Main Function                                      #
+# Desc :                                                    #
+#-----------------------------------------------------------#
+if [ $# -lt 2 ]
+then
+	print_usage
+	exit 1
+fi
+if [ `whoami` != ${USER} ]
+then
+  echo "(ERROR) Need to be running as $USER user"
+  exit 1
+fi
+
+print_title
+case ${CMD} in
+	startALL)
+	echo "----------------------------------------------------"
+	echo ">> Start MQ DQM CHANNEL : ALL                       "
+	echo "----------------------------------------------------"
+	start_all_chl "${SDRCHL_LST}"
+	start_all_chl "${SVRCHL_LST}"
+	start_all_chl "${RQTCHL_LST}"
+	sleep 1
+	print_status_allchl
+	;;
+	
+	start)
+	echo "----------------------------------------------------"
+	echo ">> Start MQ DQM CHANNEL                             "
+	echo "----------------------------------------------------"
+	chk_arg_chlname	
+	start_chl ${CHLNAME}
+	sleep 1
+	print_status_allchl
+	;;
+	
+	stopALL)
+	echo "----------------------------------------------------"
+	echo ">> Stop MQ DQM CHANNEL : ALL                        "
+	echo "----------------------------------------------------"
+	stop_all_chl "${SDRCHL_LST}"
+	stop_all_chl "${SVRCHL_LST}"
+	sleep 1
+	print_status_allchl
+	;;
+	
+	stop)
+	echo "----------------------------------------------------"
+	echo ">> Stop MQ DQM CHANNEL                              "
+	echo "----------------------------------------------------"
+	chk_arg_chlname	
+	stop_chl ${CHLNAME}
+	sleep 1
+	print_status_allchl
+	;;
+	
+	restartALL)
+	echo "----------------------------------------------------"
+	echo ">> Restart MQ DQM CHANNEL : ALL                     "
+	echo "----------------------------------------------------"	
+	stop_all_chl "${SDRCHL_LST}"
+	stop_all_chl "${SVRCHL_LST}"
+	sleep 1
+	start_all_chl "${SDRCHL_LST}"
+	start_all_chl "${SVRCHL_LST}"
+	start_all_chl "${RQTCHL_LST}"
+	sleep 1
+	print_status_allchl
+	;;
+	
+	restart)
+	echo "----------------------------------------------------"
+	echo ">> Restart MQ DQM CHANNEL                           "
+	echo "----------------------------------------------------"		
+	chk_arg_chlname
+	stop_chl ${CHLNAME}
+	sleep 1
+	start_chl ${CHLNAME}
+	sleep 1
+	print_status_allchl
+	;;
+	
+	recoveryALL)
+	echo "----------------------------------------------------"
+	echo ">> Recovery MQ DQM CHANNEL : ALL                    "
+	echo "----------------------------------------------------"
+	stop_all_chl "${SDRCHL_LST}"
+	stop_all_chl "${SVRCHL_LST}"
+	sleep 1
+	resolve_all_chl "${SDRCHL_LST}"
+	resolve_all_chl "${SVRCHL_LST}"
+	
+	reset_all_chl "${SDRCHL_LST}"
+	reset_all_chl "${SVRCHL_LST}"
+
+	start_all_chl "${SDRCHL_LST}"
+	start_all_chl "${SVRCHL_LST}"
+	sleep 1
+	print_status_allchl
+	;;
+	
+	recovery)
+	echo "----------------------------------------------------"
+	echo ">> Recovery MQ DQM CHANNEL                          "
+	echo "----------------------------------------------------"		
+	chk_arg_chlname
+	stop_chl ${CHLNAME}
+	sleep 1
+	resolve_chl ${CHLNAME}
+	reset_chl ${CHLNAME}
+	start_chl ${CHLNAME}
+	sleep 1
+	print_status_allchl
+	;;
+	
+	status)
+	#echo "----------------------------------------------------"
+	#echo ">> Status MQ DQM CHANNEL                            "
+	#echo "----------------------------------------------------"	
+	print_status_allchl
+	;;
+	
+	*) print_usage
+	break;;
+esac
+
+exit 0

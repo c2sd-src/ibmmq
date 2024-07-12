@@ -1,0 +1,2 @@
+#!/bin/ksh
+su mqm -c /MQHA/bin/hamqm_applmon_su EAIBK3P

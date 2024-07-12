@@ -1,0 +1,481 @@
+#-----------------------------------------------------------#
+# Define MQ Object (STR_CD : 11001)                      
+# DATE : 2013-10-16 15:34:40                                               
+#-----------------------------------------------------------#
+define sdr chl(SMEAI2D.CM11001.N1) completed(isNew=No)
+define sdr chl(SMEAI2D.CM11001.B1) completed(isNew=No)
+define rqstr chl(CM11001.SMEAI1D.N1) completed(isNew=No)
+define rqstr chl(CM11001.SMEAI1D.B1) completed(isNew=No)
+define rqstr chl(CM11001.SMIFM1D.N1) completed(isNew=No)
+define xmitq(CM11001.N1.XQ) completed(isNew=No)
+define xmitq(CM11001.B1.XQ) completed(isNew=No)
+define remoteq(CM11001.N1.OT) completed(isNew=No)
+define remoteq(CM11001.B1.OT) completed(isNew=No)
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11002)                      
+# DATE : 2013-10-16 15:34:40                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11002.N1) completed
+delete sdr chl(SMEAI2D.CM11002.B1) completed
+delete xmitq(CM11002.N1.XQ) completed
+delete xmitq(CM11002.B1.XQ) completed
+delete remoteq(CM11002.N1.OT) completed
+delete remoteq(CM11002.B1.OT) completed
+delete rqstr chl(CM11002.SMEAI2D.N1) completed
+delete rqstr chl(CM11002.SMEAI2D.B1) completed
+delete rqstr chl(CM11002.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11017)                      
+# DATE : 2013-10-16 15:34:44                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11017.N1) completed
+delete sdr chl(SMEAI2D.CM11017.B1) completed
+delete xmitq(CM11017.N1.XQ) completed
+delete xmitq(CM11017.B1.XQ) completed
+delete remoteq(CM11017.N1.OT) completed
+delete remoteq(CM11017.B1.OT) completed
+delete rqstr chl(CM11017.SMEAI1D.N1) completed
+delete rqstr chl(CM11017.SMEAI1D.B1) completed
+delete rqstr chl(CM11017.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11039)                      
+# DATE : 2013-10-16 15:34:48                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11039.N1) completed
+delete sdr chl(SMEAI2D.CM11039.B1) completed
+delete xmitq(CM11039.N1.XQ) completed
+delete xmitq(CM11039.B1.XQ) completed
+delete remoteq(CM11039.N1.OT) completed
+delete remoteq(CM11039.B1.OT) completed
+delete rqstr chl(CM11039.SMEAI1D.N1) completed
+delete rqstr chl(CM11039.SMEAI1D.B1) completed
+delete rqstr chl(CM11039.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11044)                      
+# DATE : 2013-10-16 15:34:52                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11044.N1) completed
+delete sdr chl(SMEAI2D.CM11044.B1) completed
+delete xmitq(CM11044.N1.XQ) completed
+delete xmitq(CM11044.B1.XQ) completed
+delete remoteq(CM11044.N1.OT) completed
+delete remoteq(CM11044.B1.OT) completed
+delete rqstr chl(CM11044.SMEAI2D.N1) completed
+delete rqstr chl(CM11044.SMEAI2D.B1) completed
+delete rqstr chl(CM11044.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11045)                      
+# DATE : 2013-10-16 15:34:56                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11045.N1) completed
+delete sdr chl(SMEAI2D.CM11045.B1) completed
+delete xmitq(CM11045.N1.XQ) completed
+delete xmitq(CM11045.B1.XQ) completed
+delete remoteq(CM11045.N1.OT) completed
+delete remoteq(CM11045.B1.OT) completed
+delete rqstr chl(CM11045.SMEAI1D.N1) completed
+delete rqstr chl(CM11045.SMEAI1D.B1) completed
+delete rqstr chl(CM11045.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11081)                      
+# DATE : 2013-10-16 15:35:01                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11081.N1) completed
+delete sdr chl(SMEAI2D.CM11081.B1) completed
+delete xmitq(CM11081.N1.XQ) completed
+delete xmitq(CM11081.B1.XQ) completed
+delete remoteq(CM11081.N1.OT) completed
+delete remoteq(CM11081.B1.OT) completed
+delete rqstr chl(CM11081.SMEAI1D.N1) completed
+delete rqstr chl(CM11081.SMEAI1D.B1) completed
+delete rqstr chl(CM11081.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11104)                      
+# DATE : 2013-10-16 15:35:05                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11104.N1) completed
+delete sdr chl(SMEAI2D.CM11104.B1) completed
+delete xmitq(CM11104.N1.XQ) completed
+delete xmitq(CM11104.B1.XQ) completed
+delete remoteq(CM11104.N1.OT) completed
+delete remoteq(CM11104.B1.OT) completed
+delete rqstr chl(CM11104.SMEAI2D.N1) completed
+delete rqstr chl(CM11104.SMEAI2D.B1) completed
+delete rqstr chl(CM11104.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11116)                      
+# DATE : 2013-10-16 15:35:09                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11116.N1) completed
+delete sdr chl(SMEAI2D.CM11116.B1) completed
+delete xmitq(CM11116.N1.XQ) completed
+delete xmitq(CM11116.B1.XQ) completed
+delete remoteq(CM11116.N1.OT) completed
+delete remoteq(CM11116.B1.OT) completed
+delete rqstr chl(CM11116.SMEAI2D.N1) completed
+delete rqstr chl(CM11116.SMEAI2D.B1) completed
+delete rqstr chl(CM11116.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11120)                      
+# DATE : 2013-10-16 15:35:13                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11120.N1) completed
+delete sdr chl(SMEAI2D.CM11120.B1) completed
+delete xmitq(CM11120.N1.XQ) completed
+delete xmitq(CM11120.B1.XQ) completed
+delete remoteq(CM11120.N1.OT) completed
+delete remoteq(CM11120.B1.OT) completed
+delete rqstr chl(CM11120.SMEAI2D.N1) completed
+delete rqstr chl(CM11120.SMEAI2D.B1) completed
+delete rqstr chl(CM11120.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11132)                      
+# DATE : 2013-10-16 15:35:17                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11132.N1) completed
+delete sdr chl(SMEAI2D.CM11132.B1) completed
+delete xmitq(CM11132.N1.XQ) completed
+delete xmitq(CM11132.B1.XQ) completed
+delete remoteq(CM11132.N1.OT) completed
+delete remoteq(CM11132.B1.OT) completed
+delete rqstr chl(CM11132.SMEAI2D.N1) completed
+delete rqstr chl(CM11132.SMEAI2D.B1) completed
+delete rqstr chl(CM11132.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11133)                      
+# DATE : 2013-10-16 15:35:21                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11133.N1) completed
+delete sdr chl(SMEAI2D.CM11133.B1) completed
+delete xmitq(CM11133.N1.XQ) completed
+delete xmitq(CM11133.B1.XQ) completed
+delete remoteq(CM11133.N1.OT) completed
+delete remoteq(CM11133.B1.OT) completed
+delete rqstr chl(CM11133.SMEAI1D.N1) completed
+delete rqstr chl(CM11133.SMEAI1D.B1) completed
+delete rqstr chl(CM11133.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11150)                      
+# DATE : 2013-10-16 15:35:25                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11150.N1) completed
+delete sdr chl(SMEAI2D.CM11150.B1) completed
+delete xmitq(CM11150.N1.XQ) completed
+delete xmitq(CM11150.B1.XQ) completed
+delete remoteq(CM11150.N1.OT) completed
+delete remoteq(CM11150.B1.OT) completed
+delete rqstr chl(CM11150.SMEAI2D.N1) completed
+delete rqstr chl(CM11150.SMEAI2D.B1) completed
+delete rqstr chl(CM11150.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11166)                      
+# DATE : 2013-10-16 15:35:30                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11166.N1) completed
+delete sdr chl(SMEAI2D.CM11166.B1) completed
+delete xmitq(CM11166.N1.XQ) completed
+delete xmitq(CM11166.B1.XQ) completed
+delete remoteq(CM11166.N1.OT) completed
+delete remoteq(CM11166.B1.OT) completed
+delete rqstr chl(CM11166.SMEAI2D.N1) completed
+delete rqstr chl(CM11166.SMEAI2D.B1) completed
+delete rqstr chl(CM11166.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11169)                      
+# DATE : 2013-10-16 15:35:34                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11169.N1) completed
+delete sdr chl(SMEAI2D.CM11169.B1) completed
+delete xmitq(CM11169.N1.XQ) completed
+delete xmitq(CM11169.B1.XQ) completed
+delete remoteq(CM11169.N1.OT) completed
+delete remoteq(CM11169.B1.OT) completed
+delete rqstr chl(CM11169.SMEAI1D.N1) completed
+delete rqstr chl(CM11169.SMEAI1D.B1) completed
+delete rqstr chl(CM11169.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11187)                      
+# DATE : 2013-10-16 15:35:38                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11187.N1) completed
+delete sdr chl(SMEAI2D.CM11187.B1) completed
+delete xmitq(CM11187.N1.XQ) completed
+delete xmitq(CM11187.B1.XQ) completed
+delete remoteq(CM11187.N1.OT) completed
+delete remoteq(CM11187.B1.OT) completed
+delete rqstr chl(CM11187.SMEAI1D.N1) completed
+delete rqstr chl(CM11187.SMEAI1D.B1) completed
+delete rqstr chl(CM11187.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11192)                      
+# DATE : 2013-10-16 15:35:42                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11192.N1) completed
+delete sdr chl(SMEAI2D.CM11192.B1) completed
+delete xmitq(CM11192.N1.XQ) completed
+delete xmitq(CM11192.B1.XQ) completed
+delete remoteq(CM11192.N1.OT) completed
+delete remoteq(CM11192.B1.OT) completed
+delete rqstr chl(CM11192.SMEAI2D.N1) completed
+delete rqstr chl(CM11192.SMEAI2D.B1) completed
+delete rqstr chl(CM11192.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11199)                      
+# DATE : 2013-10-16 15:35:46                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11199.N1) completed
+delete sdr chl(SMEAI2D.CM11199.B1) completed
+delete xmitq(CM11199.N1.XQ) completed
+delete xmitq(CM11199.B1.XQ) completed
+delete remoteq(CM11199.N1.OT) completed
+delete remoteq(CM11199.B1.OT) completed
+delete rqstr chl(CM11199.SMEAI1D.N1) completed
+delete rqstr chl(CM11199.SMEAI1D.B1) completed
+delete rqstr chl(CM11199.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11207)                      
+# DATE : 2013-10-16 15:35:50                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11207.N1) completed
+delete sdr chl(SMEAI2D.CM11207.B1) completed
+delete xmitq(CM11207.N1.XQ) completed
+delete xmitq(CM11207.B1.XQ) completed
+delete remoteq(CM11207.N1.OT) completed
+delete remoteq(CM11207.B1.OT) completed
+delete rqstr chl(CM11207.SMEAI1D.N1) completed
+delete rqstr chl(CM11207.SMEAI1D.B1) completed
+delete rqstr chl(CM11207.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11217)                      
+# DATE : 2013-10-16 15:35:54                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11217.N1) completed
+delete sdr chl(SMEAI2D.CM11217.B1) completed
+delete xmitq(CM11217.N1.XQ) completed
+delete xmitq(CM11217.B1.XQ) completed
+delete remoteq(CM11217.N1.OT) completed
+delete remoteq(CM11217.B1.OT) completed
+delete rqstr chl(CM11217.SMEAI1D.N1) completed
+delete rqstr chl(CM11217.SMEAI1D.B1) completed
+delete rqstr chl(CM11217.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 11222)                      
+# DATE : 2013-10-16 15:35:59                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM11222.N1) completed
+delete sdr chl(SMEAI2D.CM11222.B1) completed
+delete xmitq(CM11222.N1.XQ) completed
+delete xmitq(CM11222.B1.XQ) completed
+delete remoteq(CM11222.N1.OT) completed
+delete remoteq(CM11222.B1.OT) completed
+delete rqstr chl(CM11222.SMEAI2D.N1) completed
+delete rqstr chl(CM11222.SMEAI2D.B1) completed
+delete rqstr chl(CM11222.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 12058)                      
+# DATE : 2013-10-16 15:36:03                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM12058.N1) completed
+delete sdr chl(SMEAI2D.CM12058.B1) completed
+delete xmitq(CM12058.N1.XQ) completed
+delete xmitq(CM12058.B1.XQ) completed
+delete remoteq(CM12058.N1.OT) completed
+delete remoteq(CM12058.B1.OT) completed
+delete rqstr chl(CM12058.SMEAI2D.N1) completed
+delete rqstr chl(CM12058.SMEAI2D.B1) completed
+delete rqstr chl(CM12058.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 12060)                      
+# DATE : 2013-10-16 15:36:07                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM12060.N1) completed
+delete sdr chl(SMEAI2D.CM12060.B1) completed
+delete xmitq(CM12060.N1.XQ) completed
+delete xmitq(CM12060.B1.XQ) completed
+delete remoteq(CM12060.N1.OT) completed
+delete remoteq(CM12060.B1.OT) completed
+delete rqstr chl(CM12060.SMEAI2D.N1) completed
+delete rqstr chl(CM12060.SMEAI2D.B1) completed
+delete rqstr chl(CM12060.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 12066)                      
+# DATE : 2013-10-16 15:36:11                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM12066.N1) completed
+delete sdr chl(SMEAI2D.CM12066.B1) completed
+delete xmitq(CM12066.N1.XQ) completed
+delete xmitq(CM12066.B1.XQ) completed
+delete remoteq(CM12066.N1.OT) completed
+delete remoteq(CM12066.B1.OT) completed
+delete rqstr chl(CM12066.SMEAI2D.N1) completed
+delete rqstr chl(CM12066.SMEAI2D.B1) completed
+delete rqstr chl(CM12066.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 12069)                      
+# DATE : 2013-10-16 15:36:15                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM12069.N1) completed
+delete sdr chl(SMEAI2D.CM12069.B1) completed
+delete xmitq(CM12069.N1.XQ) completed
+delete xmitq(CM12069.B1.XQ) completed
+delete remoteq(CM12069.N1.OT) completed
+delete remoteq(CM12069.B1.OT) completed
+delete rqstr chl(CM12069.SMEAI1D.N1) completed
+delete rqstr chl(CM12069.SMEAI1D.B1) completed
+delete rqstr chl(CM12069.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 12075)                      
+# DATE : 2013-10-16 15:36:19                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM12075.N1) completed
+delete sdr chl(SMEAI2D.CM12075.B1) completed
+delete xmitq(CM12075.N1.XQ) completed
+delete xmitq(CM12075.B1.XQ) completed
+delete remoteq(CM12075.N1.OT) completed
+delete remoteq(CM12075.B1.OT) completed
+delete rqstr chl(CM12075.SMEAI1D.N1) completed
+delete rqstr chl(CM12075.SMEAI1D.B1) completed
+delete rqstr chl(CM12075.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13004)                      
+# DATE : 2013-10-16 15:36:23                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13004.N1) completed
+delete sdr chl(SMEAI2D.CM13004.B1) completed
+delete xmitq(CM13004.N1.XQ) completed
+delete xmitq(CM13004.B1.XQ) completed
+delete remoteq(CM13004.N1.OT) completed
+delete remoteq(CM13004.B1.OT) completed
+delete rqstr chl(CM13004.SMEAI2D.N1) completed
+delete rqstr chl(CM13004.SMEAI2D.B1) completed
+delete rqstr chl(CM13004.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13013)                      
+# DATE : 2013-10-16 15:36:28                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13013.N1) completed
+delete sdr chl(SMEAI2D.CM13013.B1) completed
+delete xmitq(CM13013.N1.XQ) completed
+delete xmitq(CM13013.B1.XQ) completed
+delete remoteq(CM13013.N1.OT) completed
+delete remoteq(CM13013.B1.OT) completed
+delete rqstr chl(CM13013.SMEAI1D.N1) completed
+delete rqstr chl(CM13013.SMEAI1D.B1) completed
+delete rqstr chl(CM13013.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13016)                      
+# DATE : 2013-10-16 15:36:32                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13016.N1) completed
+delete sdr chl(SMEAI2D.CM13016.B1) completed
+delete xmitq(CM13016.N1.XQ) completed
+delete xmitq(CM13016.B1.XQ) completed
+delete remoteq(CM13016.N1.OT) completed
+delete remoteq(CM13016.B1.OT) completed
+delete rqstr chl(CM13016.SMEAI2D.N1) completed
+delete rqstr chl(CM13016.SMEAI2D.B1) completed
+delete rqstr chl(CM13016.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13018)                      
+# DATE : 2013-10-16 15:36:36                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13018.N1) completed
+delete sdr chl(SMEAI2D.CM13018.B1) completed
+delete xmitq(CM13018.N1.XQ) completed
+delete xmitq(CM13018.B1.XQ) completed
+delete remoteq(CM13018.N1.OT) completed
+delete remoteq(CM13018.B1.OT) completed
+delete rqstr chl(CM13018.SMEAI2D.N1) completed
+delete rqstr chl(CM13018.SMEAI2D.B1) completed
+delete rqstr chl(CM13018.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13019)                      
+# DATE : 2013-10-16 15:36:40                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13019.N1) completed
+delete sdr chl(SMEAI2D.CM13019.B1) completed
+delete xmitq(CM13019.N1.XQ) completed
+delete xmitq(CM13019.B1.XQ) completed
+delete remoteq(CM13019.N1.OT) completed
+delete remoteq(CM13019.B1.OT) completed
+delete rqstr chl(CM13019.SMEAI1D.N1) completed
+delete rqstr chl(CM13019.SMEAI1D.B1) completed
+delete rqstr chl(CM13019.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13021)                      
+# DATE : 2013-10-16 15:36:44                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13021.N1) completed
+delete sdr chl(SMEAI2D.CM13021.B1) completed
+delete xmitq(CM13021.N1.XQ) completed
+delete xmitq(CM13021.B1.XQ) completed
+delete remoteq(CM13021.N1.OT) completed
+delete remoteq(CM13021.B1.OT) completed
+delete rqstr chl(CM13021.SMEAI1D.N1) completed
+delete rqstr chl(CM13021.SMEAI1D.B1) completed
+delete rqstr chl(CM13021.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13023)                      
+# DATE : 2013-10-16 15:36:48                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13023.N1) completed
+delete sdr chl(SMEAI2D.CM13023.B1) completed
+delete xmitq(CM13023.N1.XQ) completed
+delete xmitq(CM13023.B1.XQ) completed
+delete remoteq(CM13023.N1.OT) completed
+delete remoteq(CM13023.B1.OT) completed
+delete rqstr chl(CM13023.SMEAI1D.N1) completed
+delete rqstr chl(CM13023.SMEAI1D.B1) completed
+delete rqstr chl(CM13023.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Define MQ Object (STR_CD : 13028)                      
+# DATE : 2013-10-16 15:36:53                                               
+#-----------------------------------------------------------#
+define sdr chl(SMEAI2D.CM13028.N1) completed(isNew=No)
+define sdr chl(SMEAI2D.CM13028.B1) completed(isNew=No)
+define rqstr chl(CM13028.SMEAI2D.N1) completed(isNew=No)
+define rqstr chl(CM13028.SMEAI2D.B1) completed(isNew=No)
+define rqstr chl(CM13028.SMIFM1D.N1) completed(isNew=No)
+define xmitq(CM13028.N1.XQ) completed(isNew=No)
+define xmitq(CM13028.B1.XQ) completed(isNew=No)
+define remoteq(CM13028.N1.OT) completed(isNew=No)
+define remoteq(CM13028.B1.OT) completed(isNew=No)
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13032)                      
+# DATE : 2013-10-16 15:36:53                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13032.N1) completed
+delete sdr chl(SMEAI2D.CM13032.B1) completed
+delete xmitq(CM13032.N1.XQ) completed
+delete xmitq(CM13032.B1.XQ) completed
+delete remoteq(CM13032.N1.OT) completed
+delete remoteq(CM13032.B1.OT) completed
+delete rqstr chl(CM13032.SMEAI2D.N1) completed
+delete rqstr chl(CM13032.SMEAI2D.B1) completed
+delete rqstr chl(CM13032.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13038)                      
+# DATE : 2013-10-16 15:36:57                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13038.N1) completed
+delete sdr chl(SMEAI2D.CM13038.B1) completed
+delete xmitq(CM13038.N1.XQ) completed
+delete xmitq(CM13038.B1.XQ) completed
+delete remoteq(CM13038.N1.OT) completed
+delete remoteq(CM13038.B1.OT) completed
+delete rqstr chl(CM13038.SMEAI2D.N1) completed
+delete rqstr chl(CM13038.SMEAI2D.B1) completed
+delete rqstr chl(CM13038.SMIFM1D.N1) completed
+#-----------------------------------------------------------#
+# Delete MQ Object (STR_CD : 13501)                      
+# DATE : 2013-10-16 15:37:01                                               
+#-----------------------------------------------------------#
+delete sdr chl(SMEAI2D.CM13501.N1) completed
+delete sdr chl(SMEAI2D.CM13501.B1) completed
+delete xmitq(CM13501.N1.XQ) completed
+delete xmitq(CM13501.B1.XQ) completed
+delete remoteq(CM13501.N1.OT) completed
+delete remoteq(CM13501.B1.OT) completed
+delete rqstr chl(CM13501.SMEAI1D.N1) completed
+delete rqstr chl(CM13501.SMEAI1D.B1) completed
+delete rqstr chl(CM13501.SMIFM1D.N1) completed

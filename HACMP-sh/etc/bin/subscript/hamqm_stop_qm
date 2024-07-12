@@ -1,0 +1,267 @@
+#!/bin/ksh
+# @(#) public/hacmp/hamqm_stop_su, supportpacs, MQHA          1.7  07/12/03 15:51:54
+#
+# (C) Copyright IBM Corporation 2000,2008
+#
+# MC63: MQSeries for AIX - Implementing with HACMP
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   ${HASCRIPT_DIR}/bin/subscript/hamqm_stop_su <qmname> <timeout-secs>
+#
+# Stops the QM. If no timeout has been provided ($2) then the
+# endmqm is issued synchronously and this script blocks until it
+# has completed. If a timeout is provided, this script uses a 
+# phased approach to stopping the QM - each phase is given 
+# timeout-secs to complete and is then escalated to the next 
+# phase. The first phase uses "immediate", the next uses 
+# "preemptive", and the third (and final) phase uses kill -9 on 
+# the QM processes.
+#
+# Run this script as the userid that should control the QM. e.g.
+# su - mqm -c /usr/sbin/cluster/utils/hamqm_stop_su <qmname>
+
+#---------------------------------------------------------------#
+# 본 스크립트는 hamqm_stop_su 스크립트를 복사해서 편집한 버전임
+#
+# [참고] 큐매니져 On/Offline 상태를 어떻게 확인 할것인가?        
+#
+# IBM 기본 스크립트(hamqm_stop_su) 는 hamqm_running 스크립트를 
+# 통해 기동여부를 체크를 한다.
+# hamqm_running 스크립트는 qmstatus.ini 파일 정보로 큐매니져 
+# 상태 체크를 하는것으로 큐매니져의 비정상 종료 발생시 
+# qmstatus.ini 에는 Running 상태로 남아있을 수 있어 명확한 판단 
+# 기준이 안될수 있음
+# 따라서 본 스크립트에서는 hamqm_monitor_qm 스크립트를 통해
+# 큐매니져 상태 체크 하는것으로 수정한다.
+#---------------------------------------------------------------#
+
+QM=$1
+TIMEOUT=$2
+
+if [ -z "$QM" ]
+then
+  echo "hamqm_stop: ERROR! No queue manager name supplied"
+  exit 1
+fi
+
+if [ -z "$TIMEOUT" ]
+then
+  echo "hamqm_stop: ERROR! No timeout specified"
+  exit 1
+fi
+
+#-----------------------------------------------------------#
+# 큐매니져가 offline 이면 프로세스 체크후 정리              #
+#-----------------------------------------------------------#
+# Check to see if the QM is already stopped. If so, just make
+# sure no processes are lying around.
+
+${HASCRIPT_DIR}/bin/subscript/hamqm_monitor_qm ${QM} >/dev/null 2>&1
+rc=$?
+
+if [ ${rc} -ne 0 ]
+then
+  # QM is reported as offline; ensure no processes remain
+
+  # Note that this whole script should be executed under su,
+  # which is why there's no su in the following loop.
+  #
+
+  # The regular expression in the next line contains a tab character
+  # Edit only with tab-friendly editors.
+
+  echo ""
+  echo ">> ${QM} is already stopped.\n"
+  echo "< Garbage Process Clear >"
+  
+  #-----------------------------------------------------------#
+  # 1) 쓰레기 큐매니져 프로세스 강제 종료                     #
+  #-----------------------------------------------------------#
+  echo ""  
+  echo "STEP 1) ${QM} process forced terminate (kill -9 PID)\n"
+
+  srchstr="( |-m)$QM[ 	]*.*$"
+  for process in `cat ${HASCRIPT_DIR}/bin/subscript/hamqproc`
+  do
+    MQPID=`ps -ef | grep $process | grep -v grep | egrep "$srchstr" | awk '{print $2}'`
+    if [ -n "${MQPID}" ]
+    then
+      kill -9 ${MQPID}
+      echo "  >> ${QM} process :: ${process}(${MQPID})"
+    fi
+  done
+  
+  #-----------------------------------------------------------#
+  # 2) 큐매니져 관련 ipc 자원 clear                           #
+  #-----------------------------------------------------------#
+  echo ""
+  echo "STEP 2) ${QM} IPC resource clear (amqiclen -x -m ${QM})\n"  
+  
+  case `uname -s` in
+   AIX)
+     /usr/mqm/bin/amqiclen -x -m ${QM}
+     ;;
+   *)
+     /opt/mqm/bin/amqiclen -x -m ${QM}
+     ;;
+  esac
+  
+  sleep 5
+  echo ""
+  echo "QManager Stop ($QM) Completed\n"  
+  exit 0
+fi
+
+
+#-----------------------------------------------------------#
+# 큐매니져 정지 전 진행해야될 작업이 있으면 작성            #
+#-----------------------------------------------------------#
+# Invoke Pre-Offline user exit, if one exists
+if [ -x ${HASCRIPT_DIR}/bin/subscript/rc.local ]
+then
+  echo "hamqm_stop_su: launch pre-offline script for ${QM}"
+  ${HASCRIPT_DIR}/bin/subscript/rc.local ${QM} pre_offline &
+  # Exit code from pre_offline script is deliberately ignored
+fi
+
+
+
+#-----------------------------------------------------------#
+# 큐매니져 정지                                             #
+# 1)immediate                                               #
+# 2)preemptive                                              #
+# 3)terminate(kill -9)                                      #
+#-----------------------------------------------------------#
+echo ""
+echo "< Stop QManager >"
+for severity in immediate preemptive terminate
+do
+  # Issue the stop method in the background - we don't
+  # want to risk having it hang us up, indefinitely. We
+  # want to be able to run our TIMEOUT timer at
+  # the same time to give up on the attempt, and try a
+  # more forceful version. If the kill version fails then
+  # there is nothing more we can do here anyway.
+  
+  case $severity in
+
+  immediate)
+    echo ""
+    echo "STEP 1) QManager immediate stop (endmqm -i $QM)\n"    
+    endmqm -i ${QM} &
+    ;;
+  preemptive)
+    echo ""
+    echo "STEP 2) QManager preemptive stop (endmqm -p $QM)\n"      
+    endmqm -p ${QM} &
+    ;;
+  terminate)
+    echo ""
+    echo "STEP 3) ${QM} process forced terminate (kill -9 PID)\n"
+    srchstr="( |-m)$QM[ 	]*.*$"
+    
+    for process in `cat ${HASCRIPT_DIR}/bin/subscript/hamqproc`
+    do
+      MQPID=`ps -ef | grep $process | grep -v grep | egrep "$srchstr" | awk '{print $2}'`
+      if [ -n "${MQPID}" ]
+      then
+        kill -9 ${MQPID}
+        echo "  >> ${QM} process :: ${process}(${MQPID})"
+      fi
+    done
+    ;;
+  esac
+
+  sleep 1
+
+  TIMED_OUT=yes
+  SECONDS=0
+  while (( $SECONDS < ${TIMEOUT} ))
+  do
+    # Invoke hamqm_running utility
+    # echo ">> waiting for ${severity} stop of ${QM} to complete..[" `expr ${TIMEOUT} - ${SECONDS}` "]"
+    
+    ${HASCRIPT_DIR}/bin/subscript/hamqm_monitor_qm ${QM} >/dev/null 2>&1
+    rc=$?
+    if [ $rc -eq 0 ]
+    then
+      echo ">> waiting for ${severity} stop of ${QM} to complete..[" `expr ${TIMEOUT} - ${SECONDS}` "]"    
+    	echo ">> ${QM} is still running...wait for timeout"
+    else
+    #if [ $rc -ne 0 ]
+    #then
+      echo ">> ${QM} is stopping"
+      TIMED_OUT=yes
+      i=0
+      while [ $i -lt 10 ]
+      do
+        echo ">> waiting for ${severity} stop of ${QM} to complete..[" `expr ${TIMEOUT} - ${SECONDS}` "]"       
+      	#echo ">> Check for EC Process ($i)"
+        # Check for EC termination
+        # The regular expression in the next line contains a tab character
+        # Edit only with tab-friendly editors.
+        srchstr="( |-m)$QM[ 	]*.*$"
+        cnt=`ps -ef | egrep "amqzxma0|endmqm" | grep -v grep | \
+          egrep "$srchstr" | awk '{print $2}' | wc -l `
+        i=`expr $i + 1`
+        sleep 1
+        if [ $cnt -eq 0 ]
+        then
+          TIMED_OUT=no
+          break
+        fi
+      done
+      if [ ${TIMED_OUT} = "yes" ]
+      then
+      	continue
+      else
+      	break
+      fi
+    fi    
+    sleep 1
+  done # timeout loop
+
+  if [ ${TIMED_OUT} = "yes" ]
+  then
+    continue        # to next level of urgency
+  else
+    echo ">> ${QM} is Stopped"
+    break           # instance is stopped, job is done
+  fi
+done # next phase of stop
+
+#-----------------------------------------------------------#
+# 큐매니져 관련 ipc 자원 clear                              #
+#-----------------------------------------------------------#
+echo ""
+echo "STEP 4) ${QM} IPC resource clear (amqiclen -x -m ${QM})\n"  
+sleep 10
+case `uname -s` in
+ AIX)
+   /usr/mqm/bin/amqiclen -x -m ${QM}
+   ;;
+ *)
+   /opt/mqm/bin/amqiclen -x -m ${QM}
+   ;;
+esac
+#-----------------------------------------------------------#
+# endmqm 실행 결과 체크                                     #
+#-----------------------------------------------------------#
+if [ ${TIMED_OUT} = "no" ]
+then
+  echo ""
+  echo "QManager Stop ($QM) Completed"
+  exit 0
+else
+  echo ""
+  echo "QManager Stop ($QM) Completed with errors"
+  exit 1
+fi    
+exit 0

@@ -1,0 +1,91 @@
+#!/bin/ksh
+# @(#) public/hacmp/hadltmqm, supportpacs, MQHA          1.5  07/12/11 08:55:39
+#
+# (C) Copyright IBM Corporation 2000, 2008
+#
+# MC63: WebSphere MQ for AIX - Implementing with HACMP
+# MC91: High Availability for WebSphere MQ on Unix platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   To delete a queue manager on the owning node. This script
+#   will also delete subdirectories on standby nodes, but leaves
+#   the mqs.ini file alone. Administrators will have to do the
+#   edit manually (for now).
+#
+# Arguments:
+#   $1: Queue Manager name
+
+qmgr=$1
+d=`/MQHA/bin/hamqm_qm_directory $qmgr`
+if [ -z "$d" ]
+then
+  echo "Could not find information about queue manager \"$1\""
+  exit 1
+fi
+
+b=`basename $d`
+if [ -r $d ]
+then
+  # Ensure the queue manager has stopped
+  echo "ping qmgr" | runmqsc $qmgr
+  # Return code 0 is a normal end, so the qmgr is still running
+  if [ $? -eq 0 ]
+  then
+    echo "Queue Manager appears to still be running. Please stop it before"
+    echo "trying to delete it."
+    exit 1
+  fi
+
+  # Delete the symlinks, and replace with real directories. This
+  # is so the tree deletion code doesn't
+  # throw up half-way through.
+  first_time="yes"
+  for topdir in @ipcc @qmpersist @app
+  do
+    cd $d
+    for subdir in esem isem msem shmem spipe
+    do
+      if [ $first_time = "yes" ]
+      then
+	rm -f  $subdir
+	mkdir  $subdir
+	chown mqm:mqm $subdir
+	chmod 775 $subdir
+      fi
+
+      rm -f  $topdir/$subdir
+      mkdir  $topdir/$subdir
+      chown mqm:mqm $topdir/$subdir
+      chmod 775 $topdir/$subdir
+    done
+    first_time="no"
+  done
+
+  # The qmgrlocl subdirectory first appeared in WMQ V7
+  rm -f qmgrlocl
+  mkdir qmgrlocl
+  chown mqm:mqm qmgrlocl
+  chmod 775 qmgrlocl
+
+  # Then really delete the queue manager
+  dltmqm $qmgr
+else
+  echo "Directories will be deleted, but you will need to edit"
+  echo "the /var/mqm/mqs.ini file yourself, to delete the queue manager stanza."
+fi
+
+# If everything is OK, delete the IPC subtree, and the symlink out of the
+# 'normal' path to the queue manager that we created in hacrtmqm.
+if [ $? -eq 0 ]
+then
+  rm -rf /var/mqm/ipc/$b
+  rm -f /var/mqm/qmgrs/$b
+fi
+

@@ -1,0 +1,92 @@
+#!/usr/bin/ksh
+export LANG=C
+
+
+if [[ $# -lt 1 ]]
+then
+        echo " "
+        echo "usage : $0  [ QMGR Name]  [ FILTER CHAR] "
+        echo "\t QMGR Name     : Blank is Default QMGR(EAIBK3P)"
+        echo "\t FILTER CHAR   : Characters for Filtering"
+
+        echo " "
+        mqdep EAIBK3P
+        exit 0
+fi
+
+if [[ -z $1 ]]
+then
+        QMGRLIST=`dspmq  | grep Running | awk -F"(" '{print $2}' | awk -F")" '{print $1}`
+else
+        QMGRLIST=$1
+fi
+
+ 
+    LIMITs=0
+    LOOPs=0
+
+
+while true
+do
+
+
+  
+  
+  for QMGR in $QMGRLIST
+  do
+  
+    echo "*************************************************"
+    echo "* "`date "+DATE: %m/%d/%y TIME: %H:%M:%S"`"\t  QMGR: $QMGR *"
+    echo "*************************************************"
+
+   if [[ $# -lt 2 ]]
+   then
+      QDEP_LIST=`echo "dis ql(*) curdepth where(curdepth gt 0)" | runmqsc $QMGR | egrep "QUEUE|CURDEPTH"`
+   else
+      QDEP_LIST=`echo "dis ql($2*) curdepth where(curdepth gt 0)" | runmqsc $QMGR | egrep "QUEUE|CURDEPTH"`
+   fi
+
+
+     for QDEP in $QDEP_LIST
+     do
+ 
+       ATTR=`echo $QDEP | cut -d"(" -f 1`
+       ATTR_VAL=`echo $QDEP | cut -d"(" -f 2 | cut -d")" -f 1`
+         
+       if [ "$ATTR" == "QUEUE" ]
+       then
+         ECHO_STR="$QDEP"
+         QNAME=$ATTR_VAL
+       else
+         if [ "$ATTR" == "CURDEPTH" ]
+         then
+           #echo `echo $QNAME | wc -c`
+           if [[ `echo $QNAME | wc -c` -gt 34 ]]
+           then
+             ECHO_STR="$ECHO_STR\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -gt 25 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -gt 17 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -gt 9 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t\t\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -le 9 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t\t\t\t$QDEP"
+           else
+             ECHO_STR="$ECHO_STR\t\t\t\t\t$QDEP"
+           fi
+
+             echo $ECHO_STR | grep -Ev 'SYSTEM|TEST|MTE|HQ1T|SC1T|OR1T|OR1D|VAN.SEQ|.TEMP'
+          
+         fi
+       fi
+     done
+done
+
+
+sleep 5
+done

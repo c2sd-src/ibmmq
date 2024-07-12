@@ -1,0 +1,161 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module: hamqsideletebroker
+#
+# Args:
+#   broker  = name of broker to delete
+#   mquser  = userid under which broker service runs
+#   dbinst  = database instance name use by broker
+#
+# Description:
+#   This script deletes a broker. It has to be run on the 
+#   node on which the broker is currently hosted. The script
+#   detects whether the broker is currently present or whether 
+#   this node is acting only as a standby. If the broker is 
+#   present it is deleted. If it is not present an error 
+#   message is generated.
+#
+#   The broker must be removed from HACMP control and stopped
+#   before calling this script.
+#
+#   Runs as root and uses su when deleting broker
+#
+#
+
+# Check running as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Parse the args for BROKER, MQUSER
+BROKER=$1
+MQUSER=$2
+DBINST=$3
+
+if [ -z "$BROKER" ]           
+then                        
+  echo "hamqsideletebroker: ERROR! No broker supplied"
+  echo "   Usage: hamqsideletebroker <BROKER> <MQUSER> <DBINST>"
+  exit 1                    
+fi                          
+                            
+if [ -z "$MQUSER" ]           
+then                        
+  echo "hamqsideletebroker: ERROR! No userid supplied"
+  echo "   Usage: hamqsideletebroker <BROKER> <MQUSER> <DBINST>"
+  exit 1                    
+fi                          
+
+if [ -z "$DBINST" ]           
+then                        
+  echo "hamqsideletebroker: ERROR! No dbinst supplied"
+  echo "   Usage: hamqsideletebroker <BROKER> <MQUSER> <DBINST>"
+  exit 1                    
+fi                          
+
+# Up to this point, this script has assumed that the Database Instance id
+# and Database Instance name are the same. If this is not the case for the
+# database manager you are using then modify the args to this script and
+# the following line. The remainder of the script will treat DBUSER and
+# DBINST as the user id and instance name respectively.
+DBUSER=$DBINST
+
+
+
+# Work out whether the broker is locally present
+# Try and cd to broker directory
+curdir=`pwd`
+cd /var/mqsi/components/$BROKER
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsideletebroker: "
+  echo "\t Broker is not local"
+  echo "\t You should only run this script on the node which has the broker"
+  exit 1
+fi
+cd $curdir
+
+# The components/$BROKER and registry/$BROKER directories for this broker
+# are mounted and are accessed by symlinks. Destroy the symlinks,
+# move the directories back to internal disk, clearing up the shared disk.
+echo "hamqsideletebroker: Moving components/$BROKER and registry/$BROKER " \
+     "back from QM data directory"
+curdir=`pwd`
+
+# Handle the components/$BROKER directory
+cd /var/mqsi/components
+shareddir=`ls -e $BROKER | awk '{print $NF}' `
+if [ -z $shareddir ]
+then
+  echo "hamqsideletebroker: Could not find path to components/$BROKER directory"
+  echo "hamqsideletebroker: Please check parameters and directory structure"   
+  exit 1
+else
+  rm -f $BROKER               # delete the symlink
+  cp -Rp $shareddir $BROKER   # copy the dir from shared to internal
+  rm -fr $shareddir           # delete the shareddir
+fi
+
+# Handle the registry/$BROKER directory
+cd /var/mqsi/registry
+shareddir=`ls -e $BROKER | awk '{print $NF}' `
+if [ -z $shareddir ]
+then
+  echo "hamqsideletebroker: Could not find path to registry/$BROKER directory"
+  echo "hamqsideletebroker: Please check parameters and directory structure"   
+  exit 1
+else
+  rm -f $BROKER               # delete the symlink
+  cp -Rp $shareddir $BROKER   # copy the dir from shared to internal
+  rm -fr $shareddir           # delete the shareddir
+fi
+
+cd $curdir
+
+# The broker has been returned to normal directory layout, ready for deletion.
+# In order to delete broker, the database must be available. Since the 
+# AS should have been stopped, it is reasonable to assume that the database
+# has been stopped. Restart the database instance, using the DB2 sample script.
+# Because we are assuming a clean shutdown of instance took place, the DBNAME 
+# is not supplied (it is an optional arg to the sample script).
+su - $DBUSER -c "/db2data/db2inst1/sqllib/samples/hacmp/hacmp-s1.sh"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsi_start_broker_as: Could not start the database instance"
+  exit $rc
+fi
+
+
+# Delete the broker
+su - $MQUSER -c "mqsideletebroker $BROKER"
+if [ $? -ne "0" ]
+then
+  echo "hamqsideletebroker: Error from mqsideletebroker command"
+  exit 1
+fi
+
+#
+# Advise user that they can delete Application Monitor 
+#
+echo "hamqsideletebroker: You could optionally delete /MQHA/bin/hamqsi_applmon.$BROKER"
+echo "hamqsideletebroker: Completed"
+
+exit 0

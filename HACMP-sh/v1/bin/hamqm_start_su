@@ -1,0 +1,105 @@
+#!/bin/ksh
+# @(#) public/hacmp/hamqm_start_su, supportpacs, MQHA          1.7  07/12/10 16:32:09
+# (C) Copyright IBM Corporation 2000
+#
+# MC63: MQSeries for AIX - Implementing with HACMP
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# DESCRIPTION:
+#   /MQHA/bin/hamqm_start_su <qm-name>
+#
+# This script should do whatever it can to start the QM (name
+# passed as arg).
+#
+# The script has to be robust regarding making no assumptions about
+# the current state of the QM, and cleaning up any damage that might
+# have been done when the QM last terminated - which could have included
+# termination of the EC, which can leave logger and checkpointer processes
+# lying around, preventing a restart. Such orphans need to be cleaned up.
+# There's no need to look for orphaned agents as these are child processes
+# of the EC and stay in the same process group, so they will have been
+# cleaned up already.
+#
+# The script should be run by the mqm user. A wrapper script is also
+# provided to switch userids from HACMP's root authority.
+
+
+
+# Only argument is the queue manager name. Save it as QM variable
+QM=$1
+
+if [ -z "$QM" ]
+then
+  echo "hamqm_start_su: ERROR! No queue manager name supplied"
+  exit 1
+fi
+
+# Check that the QM doesn't already think it's running
+# The best way to do this is to look for any processes that
+# may be vestiges of a previous run of the QM and kill them.
+# There's little point enquiring what the contents of the
+# qmstatus.ini file are - since we should not trust them
+# anyway at this point - even if it said the QM is running
+# we have to be robust to the fact that if the EC died first
+# it may not have had a chance to update the status file.
+# Therefore, just torch the QM processes, if any. This is
+# exactly the same code that we use for the brutal (terminate)
+# severity of stop command.
+#
+
+# The regular expression in the next line contains a tab character
+# Edit only with tab-friendly editors.
+srchstr="( |-m)$QM[	 ]*.*$"
+for process in `cat /MQHA/bin/hamqproc`              
+do
+  ps -ef | grep $process | grep -v grep | \
+    egrep "$srchstr" | awk '{print $2}'| \
+       xargs kill -9
+done
+
+
+# Should now be safe to start the QM
+strmqm ${QM}
+
+rc=$?
+
+if [ $rc -eq 24 ]
+then
+  # This error shows existing processes are still connected to
+  # the queue manager - you could add processing here to kill
+  # them, and then retry the strmqm command. This is commented out
+  # for now.
+  #
+  # strmqm ${QM}
+  # rc=$?
+  echo "hamqm_start: Connected processes inhibit queue manager restart."
+fi
+
+# Fire post-online script if good return from strmqm.
+if [ $rc -eq 0 ]
+then
+  # Launch post-online script in background. Note that we
+  # run this entire script under the instance userid (e.g.
+  # "mqm") as specified by the administrator. The post-online
+  # script is therefore run under this same id.
+  #
+  # This is always done in the background so we don't delay the
+  # HA methods, which need to stay responsive and may need to
+  # start other instances.
+  #
+  if [ -x /MQHA/bin/rc.local ]
+  then
+    echo "hamqm_start: launch post_online script for ${QM}"
+    /MQHA/bin/rc.local ${QM} post_online &
+    # exit code from online script is deliberately ignored
+  fi
+fi
+
+exit $rc
+

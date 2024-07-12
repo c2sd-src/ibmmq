@@ -1,0 +1,3 @@
+#!/bin/ksh
+QMGR_NAME=`echo $0 | cut -d"." -f 2`
+su - mqm -c ${HASCRIPT_DIR/bin/subscript/hamqm_applmon_su $QMGR_NAME

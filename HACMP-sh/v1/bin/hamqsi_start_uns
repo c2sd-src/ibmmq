@@ -1,0 +1,110 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module:
+#   hamqsi_start_uns
+#
+# Args:
+#   none
+#
+# Description:
+#   This script attempts to start the UserNameServer
+#
+#   It should be run as the userid under which the UNS service 
+#   runs.
+#
+
+
+# Ensure that the UNS is not already running. In this test
+# we look for any UNS-related processes, which may have
+# been left around after a previous failure. Any that remain
+# must now be terminated. This is a brutal means of mopping 
+# up UNS processes.
+# We stop the processes in the following order:
+#   bipservice       - first so it cannot issue restarts
+#   bipuns           - last 
+#
+echo "hamqsi_start_uns: Ensure UserNameServer not already running"
+for process in bipservice bipuns
+do
+  # Output of kill redirected to /dev/null in case no processes
+  ps -ef | grep "$process UserNameServer" | grep -v grep | \
+     awk '{print $2}'| xargs kill -9 > /dev/null 2>&1
+done
+
+
+# Start the UserNameServer
+echo "hamqsi_start_uns: Start UserNameServer"
+/usr/bin/mqsistart UserNameServer > /dev/null 2>&1
+if [ $? -ne "0" ]
+then 
+  echo "hamqsi_start_uns: Bad result from mqsistart UserNameServer"
+  exit 1
+fi
+
+# Check to see if the UNS service has started. This loop 
+# uses a fixed online timeout of approx. 10 seconds.
+TIMED_OUT=yes
+i=0
+while [ $i -lt 10 ]
+do
+  # Check for UNS start. We look for bipservice and 
+  # bipuns to be running.
+  # Look to see whether bipservice is running
+  cnt=`ps -ef | grep "bipservice UserNameServer" | grep -v grep | wc -l`
+  if [ $cnt -gt 0 ]
+  then
+    # Look to see whether bipuns is running
+    cnt=`ps -ef | grep "bipuns UserNameServer" | grep -v grep | wc -l`
+    if [ $cnt -gt 0 ]
+    then
+      # UNS is online
+      echo "hamqsi_start_uns: UserNameServer is running"
+      TIMED_OUT=no
+      break  # out of timing loop
+    fi
+  fi
+  # Manage the loop counter
+  i=`expr $i + 1`
+  sleep 1
+done
+
+# Report error if UNS failed to start in time
+if [ ${TIMED_OUT} = "yes" ]
+then 
+  echo "hamqsi_start_uns: UNS service failed to start"
+  exit 1
+else
+  # UNS was started and came online within timeout.
+  # Launch post-online script in background. We are running
+  # as the UNS userid and run the script as this userid.
+  # This is always done in the background so we don't delay the
+  # HA methods, which need to stay responsive. A synchronous
+  # call to the user method might delay (indefinitely) the
+  # completion of our start_uns method, which would upset
+  # other actions being taken by the cluster.
+
+  # Is there an executable method for us to run?
+  if [ -x /MQHA/bin/rc.mqsi ]
+  then
+    echo "hamqsi_start_broker: run post_online script for UserNameServer"
+    /MQHA/bin/rc.mqsi UserNameServer post_online &
+    # The exit code from online script is deliberately ignored
+  fi
+fi
+
+
+exit 0

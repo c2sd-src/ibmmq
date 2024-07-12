@@ -1,0 +1,83 @@
+#!/bin/ksh
+#Global Variable
+MQUSER=mqm
+BKUSER=mqsi
+QMNAME=EAIBK3P
+BKNAME=EAIBK3P
+MQEQM=GW31
+
+MQHA_BIN=/MQHA/bin
+TIMEOUT=30
+
+#ILinkBridge Stop
+echo "\nILinkBridge stopping."
+su $MQUSER -c "$MQHA_BIN/ILinkBrdg_stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop ILinkBridge"
+  exit $rc
+fi
+
+#ILink Server Stop
+#echo "\nILink Server stopping."
+#su $MQUSER -c "$MQHA_BIN/ILinkServer_stop"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not stop ILink Server"
+#  exit $rc
+#fi
+
+#MTE Control Center Agent stop
+echo "\nMTE Control Center Agent stopping."
+su $MQUSER -c "/MQHA/bin/hamteagent_op stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop MTE Agent"
+  exit $rc
+fi
+
+#WMQ Channel stop
+echo "\n$QMNAME Channel stopping"
+su $MQUSER -c "$MQHA_BIN/hamqm_chl $QMNAME stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop $QMNAME Channel"
+  exit $rc
+fi
+
+#MQ Trigger Monitor Stop
+#echo "\n[$QMNAME] Trigger Monitor stopping"
+#su $MQUSER -c "/MQHA/bin/hamqm_trm $QMNAME stop"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not stop WMQ Trigger Monitor"
+#  exit $rc
+#fi
+
+#MQ, WMQI, DB2 stop
+echo "$QMNAME EAI Component Stopping(WMB, WMQ, DB2 instance) in $TIMEOUT SEC."
+#su $BKUSER -c "$MQHA_BIN/hamqsi_stop_broker_as $BKNAME $QMNAME $BKUSER $DBINST $TIMEOUT" 
+su $BKUSER -c "$MQHA_BIN/hamqsi_stop_broker_as $BKNAME $QMNAME $MQUSER $BKUSER $TIMEOUT"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop $QMNAME EAI Component"
+  exit $rc
+fi
+
+#MQe Gateway stop
+echo "\nMQe Gateway stopping."
+su $MQUSER -c "${MQHA_BIN}/hamqe_op ${MQEQM} stop"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not stop MQe Gateway"
+  exit $rc
+fi
+
+exit 0

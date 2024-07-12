@@ -1,0 +1,281 @@
+#!/bin/bash
+
+#################################
+#       Declare Var             #
+#################################
+USER="mqm"
+EAI_BIN=/MQHA/bin
+QMGR=$1
+
+if [ $# -eq 0 ]
+then
+        echo -e "\n"
+        echo -e "usage : $0 [QMNAME] { start | stop | status | restart | recover CHL NAME }"
+        echo -e "\n"
+        exit
+fi
+
+if [ `whoami` != $USER ]
+then
+  echo "Need to be running as $USER user"
+  exit 1
+fi
+
+# Channel Name TMP
+#Send Channel
+echo "dis chl(*)" | runmqsc $QMGR |  grep SDR | \
+        grep -v SYSTEM | grep -v TO | cut -f 2 -d "(" | cut -f 1 -d ")" | \
+        awk -F" " '{print $1}' > $EAI_BIN/tmp/sdr_chl_$QMGR
+
+#Requestor Channel TMP
+echo "dis chl(*)" | runmqsc $QMGR |  grep RQSTR | \
+        grep -v SYSTEM | grep -v TO | cut -f 2 -d "(" | cut -f 1 -d ")" | \
+        awk -F" " '{print $1}' > $EAI_BIN/tmp/rcvr_chl_$QMGR
+
+#################################
+#       Sub Function            #
+#################################
+status_view_chl()
+{
+echo "SENDER CHANNEL STATUS"
+cat $EAI_BIN/tmp/sdr_chl_$QMGR | while read sdr_chl
+do
+        echo -e "Status Channel Name : "$sdr_chl" \t: " \
+        `echo "dis chs($sdr_chl) status" | runmqsc $QMGR   \
+                                        | grep STATUS     \
+                                        | cut -f 3 -d "(" \
+                                        | cut -f 1 -d ")"`
+done
+
+echo "REQSTR CHANNEL STATUS"
+cat $EAI_BIN/tmp/rcvr_chl_$QMGR | while read rcvr_chl
+do
+        echo -e "Status Channel Name : "$rcvr_chl" \t: " \
+        `echo "dis chs($rcvr_chl) status" | runmqsc $QMGR   \
+                                        | grep STATUS     \
+                                        | cut -f 3 -d "(" \
+                                        | cut -f 1 -d ")"`
+done
+}
+
+status_chk_chl_sdr()
+{
+if [ `echo "dis chs($sdr_chl) status" | runmqsc $QMGR | grep STATUS |\
+        cut -f 3 -d "(" | cut -f 1 -d ")"` = "RUNNING" ]
+then
+        return 0 #RUNNING
+else
+        if [ `echo "dis chs($sdr_chl) status" | runmqsc $QMGR | grep STATUS |\
+        cut -f 3 -d "(" | cut -f 1 -d ")"` = "STOPPED" ]
+        then
+                return 1 #STOPPED
+
+        else
+                return 2 #UNKNOWN
+        fi
+fi
+} 2>/dev/null
+
+status_chk_chl_rcvr()
+{
+if [ `echo "dis chs($rcvr_chl) status" | runmqsc $QMGR | grep STATUS |\
+        cut -f 3 -d "(" | cut -f 1 -d ")"` = "RUNNING" ]
+then
+        return 0 #RUNNING
+else
+        if [ `echo "dis chs($rcvr_chl) status" | runmqsc $QMGR | grep STATUS |\
+        cut -f 3 -d "(" | cut -f 1 -d ")"` = "STOPPED" ]
+        then
+                return 1 #STOPPED
+
+        else
+                return 2 #UNKNOWN
+        fi
+fi
+} 2>/dev/null
+
+recover_chl_sdr()
+{
+status_chk_chl_sdr
+
+if [ $? -eq 0 ]
+then
+        echo "$sdr_chl CHANNEL is already running..."
+        echo "$sdr_chl CHANNEL recover abort."
+else
+        if [ $? -eq 1 ]
+        then
+                echo "$sdr_chl CHANEEL is STOP recovering"
+                echo "resolve chl($sdr_chl) backout" | runmqsc $QMGR | grep $NAME
+                echo "reset chl($sdr_chl)" | runmqsc $QMGR | grep $NAME
+                echo "start chl($sdr_chl)" | runmqsc $QMGR | grep $NAME
+        else
+                echo "$sdr_chl CHANEEL is recovering"
+                echo "stop chl($sdr_chl) force" | runmqsc $QMGR | grep $NAME
+                echo "resolve chl($sdr_chl) backout" | runmqsc $QMGR | grep $NAME
+                echo "reset chl($sdr_chl)" | runmqsc $QMGR | grep $NAME
+                echo "start chl($sdr_chl)" | runmqsc $QMGR | grep $NAME
+        fi
+fi
+}
+
+invoke_chl()
+{
+cat $EAI_BIN/tmp/sdr_chl_$QMGR | while read sdr_chl
+do
+
+status_chk_chl_sdr
+
+if [ $? -eq 0 ]
+then
+        echo "$sdr_chl CHANNEL is already running..."
+else
+        status_chk_chl_sdr
+
+        if [ $? -eq 1 ]
+        then
+                echo "$sdr_chl" CHANEEL is invoking...
+                echo "start chl($sdr_chl)" | runmqsc $QMGR | grep $sdr_chl
+        else
+                echo $sdr_chl CHANNEL status is inactive OR abnormal...
+                echo "start chl($sdr_chl)" | runmqsc $QMGR | grep $sdr_chl
+                echo "inactive is invoking. abnormal need status check"
+        fi
+fi
+
+done
+
+cat $EAI_BIN/tmp/rcvr_chl_$QMGR | while read rcvr_chl
+do
+
+status_chk_chl_rcvr
+
+if [ $? -eq 0 ]
+then
+        echo "$rcvr_chl CHANNEL is already running..."
+else
+        status_chk_chl_rcvr
+
+        if [ $? -eq 1 ]
+        then
+                echo "$rcvr_chl" CHANEEL is invoking...
+                echo "start chl($rcvr_chl)" | runmqsc $QMGR | grep $rcvr_chl
+        else
+                echo "$rcvr_chl" CHANEEL is invoking...
+                echo "start chl($rcvr_chl)" | runmqsc $QMGR | grep $rcvr_chl
+        fi
+fi
+
+done
+}
+
+stop_chl()
+{
+cat $EAI_BIN/tmp/sdr_chl_$QMGR | while read sdr_chl
+do
+
+status_chk_chl_sdr
+
+if [ $? -eq 0 ]
+then
+        echo "$sdr_chl" CHANEEL is stopping...
+        echo "stop chl($sdr_chl)" | runmqsc $QMGR | grep $sdr_chl
+else
+        status_chk_chl_sdr
+
+        if [ $? -eq 1 ]
+        then
+                echo "$sdr_chl CHANNEL is already stopped..."
+        else
+                echo "$sdr_chl" CHANEEL is stopping...
+                echo "stop chl($sdr_chl)" | runmqsc $QMGR | grep $sdr_chl
+        fi
+fi
+done
+}
+
+#########################################
+#       Main Function                   #
+#########################################
+case $2 in
+        start)
+        echo "####################################################"
+        echo "#      MQSeries Message Channel Operation Tool     #"
+        echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+        echo "####################################################"
+
+        echo "####################################################"
+        echo "#         Start MQSeries SENDER CHANNEL            #"
+        echo "####################################################"
+        echo `date` MQSeries Message Channel Start
+        invoke_chl
+        sleep 2
+        status_view_chl
+        ;;
+
+        stop)
+        echo "####################################################"
+        echo "#      MQSeries Message Channel Operation Tool     #"
+        echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+        echo "####################################################"
+
+        echo "####################################################"
+        echo "#         Start MQSeries SENDER CHANNEL            #"
+        echo "####################################################"
+        echo `date` MQSeries Message Channel Stop
+        stop_chl
+        sleep 2
+        status_view_chl
+        ;;
+
+        status)
+        echo "####################################################"
+        echo "#      MQSeries Message Channel Operation Tool     #"
+        echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+        echo "####################################################"
+
+        echo "####################################################"
+        echo "#         Start MQSeries SENDER CHANNEL            #"
+        echo "####################################################"
+        echo `date` Invoke MQSeries Message Channel Status Display
+
+        status_view_chl
+        ;;
+
+        restart)
+        echo "####################################################"
+        echo "#      MQSeries Message Channel Operation Tool     #"
+        echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+        echo "####################################################"
+
+        echo "####################################################"
+        echo "#         Start MQSeries SENDER CHANNEL            #"
+        echo "####################################################"
+        echo `date` Invoke MQSeries Message Channel Restart
+
+        stop_chl
+        sleep 5
+        invoke_chl
+        sleep 2
+        status_view_chl
+        ;;
+        recover)
+        echo "####################################################"
+        echo "#      MQSeries Message Channel Operation Tool     #"
+        echo "#     Copyright MOCOCO Inc. ALL RIGHTS RESERVED.   #"
+        echo "####################################################"
+
+        echo "####################################################"
+        echo "#         Start MQSeries SENDER CHANNEL            #"
+        echo "####################################################"
+        echo `date` Invoke MQSeries Message Channel Recover
+        echo "Warning!!! Indoubt Status ALL Backout"
+        recover_chl_sdr $3
+        status_view_chl
+        ;;
+
+        *) echo "usage : $0 [QMNAME] { start | stop | status | restart | recover }"
+        break;;
+esac
+
+exit 0

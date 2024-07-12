@@ -1,0 +1,122 @@
+#!/bin/ksh
+#Global Variable
+#export LANG=en_US
+MQUSER=mqm
+BKUSER=mqsi
+QMNAME=EAIBK1P
+BKNAME=EAIBK1P
+DBINST=mqsi
+DBNAME=EAIBK1DB
+MQEQM=GW11
+
+MQHA_BIN=/MQHA/bin
+ZETA_BIN=/mte/kerberos/ZETA/bin
+#MQ, WMQI, DB2 start
+echo "$QMNAME EAI Component Stating(WMB, WMQ, DB2 instance)"
+$MQHA_BIN/hamqsi_start_broker_as $BKNAME $QMNAME $BKUSER $DBINST $DBNAME 
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start $QMNAME EAI Component"
+  exit $rc
+fi
+
+#WMQ Channel start
+echo "\n$QMNAME Channel Starting"
+su $MQUSER -c "$MQHA_BIN/hamqm_chl $QMNAME start"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start $QMNAME Channel"
+  exit $rc
+fi
+
+
+#MQ Trigger Monitor Start
+#echo "\n[$QMNAME] Trigger Monitor starting"
+#su $MQUSER -c "/MQHA/bin/hamqm_trm $QMNAME start"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start WMQ Trigger Monitor"
+#  exit $rc
+#fi
+
+#MTE Control Center Agent start
+echo "\nMTE Control Center Agent Starting."
+su $MQUSER -c "$MQHA_BIN/hamteagent_op start"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start MTE Agent"
+  exit $rc
+fi
+
+#Waitting for start MQ
+#echo "Watitting for start MQ"
+#sleep 120 
+
+#MQe Gateway start
+echo "\nMQe Gateway Starting."
+su $MQUSER -c "$MQHA_BIN/hamqe_op $MQEQM start $QMNAME"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start MQe Gateway"
+  exit $rc
+fi
+
+#Appv Socket Demon start
+echo "\nAppv Socket Demon Starting."
+su $MQUSER -c "/mte/socketgw/bin/startup.sh"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start Appv Socket Demon"
+  exit $rc
+fi
+
+
+
+#echo "\nMQe Gateway Starting."
+#su $MQUSER -c "$MQHA_BIN/hamqe_op GW21 start $QMNAME"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start MQe Gateway"
+#  exit $rc
+#fi
+
+#ZETA_ONLINE start
+echo "\nZETA_ONLINE Starting."
+su $BKUSER -c "/mte/kerberos/ZETA_ONLINE/bin/startup.sh"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start ZETA_ONLINE"
+  exit $rc
+fi
+
+#ZETA_TMONEY start
+echo "\nZETA_TMONEY Starting."
+su $BKUSER -c "/mte/kerberos/ZETA_TMONEY/bin/startup.sh"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start ZETA_TMONEY"
+  exit $rc
+fi
+
+#ZETA_BATCH start
+#echo "\nZETA_BATCH Starting."
+#su $BKUSER -c "/mte/kerberos/ZETA_BATCH/bin/startup.sh"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start ZETA_BATCH"
+#  exit $rc
+#fi
+
+
+exit 0
+

@@ -1,0 +1,94 @@
+#!/usr/bin/ksh
+export LANG=C
+if [[ $# -lt 1 ]]
+then
+        echo " "
+        echo "usage : $0  [ COUNT ]  [ SYSTEM Q view(Y/N) ]  [ FILTER CHAR] [ QMGR Name]"
+        echo "\t COUNT         : 0 - Unlimit or >= 1"
+        echo "\t System Q View : Y - show System Q or N"
+        echo "\t FILTER CHAR   : Characters for Filtering"
+        echo "\t QMGR Name     : Blank is Default QMGR"
+        echo " "
+        qdep 1 N
+        exit 0
+fi
+if [[ -z $4 ]]
+then
+        QMGRLIST=`dspmq  | grep Running | awk -F"(" '{print $2}' | awk -F")" '{print $1}`
+else
+        QMGRLIST=$4
+fi
+if [[ $1 = 0 ]]
+then
+        LIMITs=1
+else
+        LIMITs=0
+        LOOPs=0
+fi
+while true
+do
+  echo "*************************************************"
+  echo "*\t"`date "+DATE: %m/%d/%y TIME: %H:%M:%S"`"\t\t*"
+  echo "*************************************************"
+  for QMGR in $QMGRLIST
+  do
+    echo "*************************************************"
+    echo "*\t\tQMGR : $QMGR\t\t\t*"
+    echo "*************************************************"
+    if [[ $# -lt 4 ]]
+   then
+      QDEP_LIST=`echo "dis ql(*) curdepth where(curdepth gt 0)" | runmqsc $QMGR | egrep "QUEUE|CURDEPTH"`
+   else
+      QDEP_LIST=`echo "dis ql($3*) curdepth where(curdepth gt 0)" | runmqsc $QMGR | egrep "QUEUE|CURDEPTH"`
+   fi
+     for QDEP in $QDEP_LIST
+     do
+       ATTR=`echo $QDEP | cut -d"(" -f 1`
+       ATTR_VAL=`echo $QDEP | cut -d"(" -f 2 | cut -d")" -f 1`
+       if [ "$ATTR" == "QUEUE" ]
+       then
+         ECHO_STR="$QDEP"
+         QNAME=$ATTR_VAL
+       else
+         if [ "$ATTR" == "CURDEPTH" ]
+         then
+           #echo `echo $QNAME | wc -c`
+           if [[ `echo $QNAME | wc -c` -gt 34 ]]
+           then
+             ECHO_STR="$ECHO_STR\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -gt 25 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -gt 17 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -gt 9 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t\t\t$QDEP"
+           elif [[ `echo $QNAME | wc -c` -le 9 ]]
+           then
+             ECHO_STR="$ECHO_STR\t\t\t\t\t$QDEP"
+           else
+             ECHO_STR="$ECHO_STR\t\t\t\t\t$QDEP"
+           fi
+           if [[ "$2" == "Y" ]]
+           then
+             echo $ECHO_STR
+           else
+             echo $ECHO_STR | grep -v SYSTEM
+           fi
+         fi
+       fi
+     done
+done
+if [[ $LIMITs -eq 0 ]]
+then
+((LOOPs+=1))
+if [[ $LOOPs -eq $1 ]]
+then
+       exit
+fi
+fi
+sleep 3
+done
+

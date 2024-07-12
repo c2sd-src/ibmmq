@@ -1,0 +1,162 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+#
+# Module:
+#   hamqsi_stop_broker_as
+#
+# Arguments are:
+#   broker = name of broker 
+#   qm     = name of broker queue manager
+#   mquser = user account under which QM and broker run
+#   dbinst = name of database instance that holds broker database
+#   timeout = max time to allow each phase of stop processing
+#
+# Description:
+#   This script stops the Broker, Queue Manager and Database Instance
+#   in that sequence.
+#  
+#   Broker:
+#   The script invokes the hamqsi_stop_broker script to stop the 
+#   broker, which checks that the broker is fully stopped.
+#  
+#   Queue Manager:
+#   This script uses the hamqm_stop_su script supplied by WebSphere 
+#   MQ SupportPac MC91: High Availability for WebSphere MQ on Unix 
+#   platforms, to manage the WebShpere MQ Queue Manager termination.
+#   The hamqm_stop_su script ensures that the QM is fully stopped.
+#  
+#   Database Instance and Database:
+#   This script invokes the DB2 HACMP sample hacmp-stop.sh script 
+#   to stop the database instance.
+#  
+#   The hamqsi_stop_broker_as script should be run as root. 
+
+
+# Check running as root
+#if [ `id -u`  -ne 0 ]
+#then
+#  echo "Must be running as root"
+#  exit 1
+#fi
+
+ 
+BROKER=$1
+QM=$2
+MQUSER=$3
+DBINST=$4
+TIMEOUT=$5
+
+# Check all parameters
+
+if [ -z "$BROKER" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No Broker name supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <DBINST> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$QM" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No queue manager name supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <DBINST> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No userid supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <DBINST> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$DBINST" ]
+then
+  echo "hamqsi_stop_broker_as: ERROR! No database instance name supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <DBINST> <TIMEOUT>"
+  exit 1
+fi
+
+if [ -z "$TIMEOUT" ]
+then
+  echo "hamsi_stop_broker_as: ERROR! No Timeout value supplied"
+  echo "   Usage: hamqsi_stop_broker_as <BROKER> <QM> <MQUSER> <DBINST> <TIMEOUT>"
+  exit 1
+fi
+
+# Up to this point, this script has assumed that the Database Instance id 
+# and Database Instance name are the same. If this is not the case for the 
+# database manager you are using then modify the args to this script and 
+# the following line. The remainder of the script will treat DBUSER and 
+# DBINST as the user id and instance name respectively. 
+DBUSER=$DBINST
+
+
+METHOD_STATUS="OK"
+
+# ------------------------------------------------------------------- 
+# Stop the BROKER
+#
+echo "hamqsi_stop_broker_as: Stop Broker " $BROKER
+#su - $MQUSER -c "/MQHA/bin/hamqsi_stop_broker $BROKER $TIMEOUT"
+su - $BKUSER -c "/MQHA/bin/hamqsi_stop_broker $BROKER $TIMEOUT"
+if [ $? -ne "0" ]
+then
+  # Even if the above operation failed, just report and then continue by 
+  # stopping other components
+  echo "hamqsi_stop_broker_as: Attempt to stop broker $BROKER failed"
+  METHOD_STATUS="Error"
+fi
+
+# ------------------------------------------------------------------- 
+# Stop the Queue Manager, using script from MC63
+#
+echo "hamqsi_stop_broker_as: Stop Queue Manager $QM"
+#su $MQUSER -c "/MQHA/bin/hamqm_stop_su $QM $TIMEOUT"
+su - mqm -c "/MQHA/bin/hamqm_stop_su $QM $TIMEOUT"
+if [ $? -ne "0" ]
+then
+  # Even if the above operation failed, just report and then continue by 
+  # stopping other components
+  echo "hamqsi_stop_broker_as: Attempt to stop queue manager $QM failed"
+  METHOD_STATUS="Error"
+fi
+
+# ------------------------------------------------------------------- 
+# Stop the database  
+#
+echo "hamqsi_stop_broker_as: Stop Database Instance $DBINST"
+#su - $DBUSER /usr/lpp/db2_06_01/samples/hacmp/hacmp-stop.sh
+su - $DBUSER -c "/opt/IBM/db2/V9.1/samples/hacmp/hacmp-stop.sh" 1> /dev/null
+if [ $? -ne "0" ]
+then
+  # If the above operation failed, report it but there is nothing more we
+  # can do.
+  echo "hamqsi_stop_broker_as: Attempt to stop database instance $DBINST failed"
+  METHOD_STATUS="Error"
+fi
+
+
+if [ ${METHOD_STATUS} = "OK" ]
+then
+  exit 0
+else
+  echo "hamqsi_stop_broker_as: Completed with errors"
+  exit 1
+fi
+
+
+

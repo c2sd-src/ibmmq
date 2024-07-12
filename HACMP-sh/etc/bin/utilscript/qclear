@@ -1,0 +1,59 @@
+#!/bin/ksh
+#-----------------------------------------------------------#
+# Define Variables                                          #
+#-----------------------------------------------------------#
+export LANG=C
+
+SCRIPT_PATH=~mqm/bin/utilscript
+QCLEAR_CMD=""
+
+QUEUE=$1
+QMGR=$2
+
+#-----------------------------------------------------------#
+# Validation Check                                          #
+#-----------------------------------------------------------#
+if [ `whoami` != mqm ]
+then
+  echo "Must be running as mqm user"
+  exit 1
+fi
+
+if [ -z "$QUEUE" ]
+then
+  echo "Usage : $0 [QUEUE] [QMGR]"
+  exit 1
+fi
+
+if [ -z "$QMGR" ]
+then
+  echo "Usage : $0 [QUEUE] [QMGR]"
+  exit 1
+fi
+
+#-----------------------------------------------------------#
+# QCLEAR_CMD                                                #
+#-----------------------------------------------------------#
+case `uname -s` in
+	AIX) 
+		QCLEAR_CMD=${SCRIPT_PATH}/qclear_aix
+	;;
+	SunOS)
+		QCLEAR_CMD=${SCRIPT_PATH}/qclear_sun
+	;;
+	HP-UX)
+		IS_IA64=`uname -a | grep ia64`
+		if [ -z "${IS_IA64}" ]
+		then
+			QCLEAR_CMD=${SCRIPT_PATH}/qclear_hp	  
+		else
+			QCLEAR_CMD=${SCRIPT_PATH}/qclear_hpia64
+		fi
+	;;
+esac
+
+
+#-----------------------------------------------------------#
+# QCLEAR RUN                                                #
+#-----------------------------------------------------------#
+${QCLEAR_CMD} ${QUEUE} ${QMGR}

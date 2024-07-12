@@ -1,0 +1,121 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module: hamqsideleteusernameserver
+#
+# Args:
+#   mquser  = userid under which UNS service runs
+#
+# Description:
+#   This script deletes the UNS. It has to be run on the 
+#   node on which the UNS is currently hosted. The script
+#   detects whether the UNS is currently present or whether 
+#   this node is acting only as a standby. If the UNS is 
+#   present it is deleted. If it is not present an error 
+#   message is generated.
+#
+#   The UNS must be removed from HACMP control and stopped
+#   before calling this script.
+#
+#   Runs as root and uses su when deleting UNS
+#
+#
+
+# Check running as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Parse the args for MQUSER
+MQUSER=$1
+
+if [ -z "$MQUSER" ]           
+then                        
+  echo "hamqsideleteusernameserver: ERROR! No userid supplied"
+  echo "   Usage: hamqsideleteusernameserver <MQUSER>"
+  exit 1                    
+fi                          
+
+
+# Work out whether the UNS is locally present
+# Try and cd to UserNameServer directory
+curdir=`pwd`
+cd /var/mqsi/components/UserNameServer
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "hamqsideleteusernameserver: "
+  echo "\t UserNameServer is not local"
+  echo "\t You should only run this script on the node which has the UserNameServer"
+  exit 1
+fi
+cd $curdir
+
+# The brokers/UserNameServer and registry/UserNameServer directories for the UNS
+# are mounted and are accessed by symlinks. Destroy the symlinks,
+# move the directories back to internal disk, clearing up the shared disk.
+echo "hamqsideleteusernameserver: Moving components/UserNameServer and registry/UserNameServer " \
+     "back from QM data directory"
+curdir=`pwd`
+
+# Handle the brokers/UserNameServer directory
+cd /var/mqsi/components
+shareddir=`ls -e UserNameServer | awk '{print $NF}' `
+if [ -z $shareddir ]
+then
+  echo "hamqsideleteusernameserver: Could not find path to components/UserNameServer directory"
+  echo "hamqsideleteusernameserver: Please check parameters and directory structure"   
+  exit 1
+else
+  rm -f UserNameServer               # delete the symlink
+  cp -Rp $shareddir UserNameServer   # copy the dir from shared to internal
+  rm -fr $shareddir                  # delete the shareddir
+fi
+
+# Handle the registry/UserNameServer directory
+cd /var/mqsi/registry
+shareddir=`ls -e UserNameServer | awk '{print $NF}' `
+if [ -z $shareddir ]
+then
+  echo "hamqsideleteusernameserver: Could not find path to registry/UserNameServer directory"
+  echo "hamqsideleteusernameserver: Please check parameters and directory structure"   
+  exit 1
+else
+  rm -f UserNameServer               # delete the symlink
+  cp -Rp $shareddir UserNameServer   # copy the dir from shared to internal
+  rm -fr $shareddir                  # delete the shareddir
+fi
+
+cd $curdir
+
+# Delete the UNS
+su - $MQUSER -c "mqsideleteusernameserver"
+if [ $? -ne "0" ]
+then
+  echo "hamqsideleteusernameserver: Error from mqsideleteusernameserver command"
+  exit 1
+fi
+
+echo "hamqsideleteusernameserver: Completed"
+
+#
+# Advise user that they can delete Application Monitor 
+#
+echo "hamqsideleteusernameserver: You could optionally delete /MQHA/bin/hamqsi_applmon.UNS"
+
+exit 0

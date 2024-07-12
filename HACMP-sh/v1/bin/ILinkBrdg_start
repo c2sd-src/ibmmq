@@ -1,0 +1,3 @@
+/mqm/data/mi/ILinkBridge/ILinkBridgeCtr start GW31_ILINK 1
+/mqm/data/mi/ILinkBridge/ILinkBridgeCtr start GW41_ILINK 1
+/mqm/data/mi/ILinkBridge/ILinkBridgeCtr start IIP_MONITOR 1

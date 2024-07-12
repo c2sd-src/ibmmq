@@ -1,0 +1,99 @@
+#!/usr/bin/qsh
+tgtlib="MS03"
+
+system "CRTLIB LIB(${tgtlib})"
+system "CLRLIB LIB(${tgtlib})"
+
+echo "Copying C source"
+tgtpf="QCSRC"
+system "CRTSRCPF FILE(${tgtlib}/${tgtpf}) RCDLEN(240)"
+for OBJS in `ls -rt *.c`; do
+    tgt=${OBJS%\.*}
+    echo "** $OBJS **"
+    system "ADDPFM FILE(${tgtlib}/${tgtpf}) MBR(${tgt})"
+    cat $OBJS | Rfile -wQ "${tgtlib}/${tgtpf}(${tgt})"
+done
+
+echo "Copying header file source"
+tgtpf="H"
+system "CRTSRCPF FILE(${tgtlib}/${tgtpf}) RCDLEN(240)"
+for OBJS in `ls -rt *.h`; do
+    tgt=${OBJS%\.*}
+    echo "** $OBJS **"
+    system "ADDPFM FILE(${tgtlib}/${tgtpf}) MBR(${tgt})"
+    cat $OBJS | Rfile -wQ "${tgtlib}/${tgtpf}(${tgt})"
+done
+
+echo "Copying CL command source"
+tgtpf="QCMDSRC"
+system "CRTSRCPF FILE(${tgtlib}/${tgtpf}) RCDLEN(240)"
+for OBJS in `ls -rt *.cmd`; do
+    tgt=${OBJS%\.*}
+    echo "** $OBJS **"
+    system "ADDPFM FILE(${tgtlib}/${tgtpf}) MBR(${tgt})"
+    cat $OBJS | Rfile -wQ "${tgtlib}/${tgtpf}(${tgt})"
+done
+
+echo "Copying README source"
+tgtpf="README"
+system "CRTSRCPF FILE(${tgtlib}/${tgtpf}) RCDLEN(240)"
+for OBJS in `ls -rt *.me`; do
+    tgt=${OBJS%\.*}
+    echo "** $OBJS **"
+    system "ADDPFM FILE(${tgtlib}/${tgtpf}) MBR(${tgt})"
+    cat $OBJS | Rfile -wQ "${tgtlib}/${tgtpf}(${tgt})"
+done
+
+echo "Copying CL source"
+tgtpf="QCLSRC"
+system "CRTSRCPF FILE(${tgtlib}/${tgtpf}) RCDLEN(240)"
+for OBJS in `ls -rt *.clp`; do
+    tgt=${OBJS%\.*}
+    echo "** $OBJS **"
+    system "ADDPFM FILE(${tgtlib}/${tgtpf}) MBR(${tgt})"
+    cat $OBJS | Rfile -wQ "${tgtlib}/${tgtpf}(${tgt})"
+    system "CRTCLPGM PGM(${tgtlib}/${tgt}) TGTRLS(V5R4M0) SRCFILE(${tgtlib}/${tgtpf})"
+done
+
+/qsys.lib/${tgtlib}.lib/buildms03.pgm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

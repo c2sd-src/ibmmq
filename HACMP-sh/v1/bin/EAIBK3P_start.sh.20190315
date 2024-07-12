@@ -1,0 +1,87 @@
+#!/bin/ksh
+#Global Variable
+MQUSER=mqm
+BKUSER=mqsi
+QMNAME=EAIBK3P
+BKNAME=EAIBK3P
+MQEQM=GW31
+
+MQHA_BIN=/MQHA/bin
+
+#MQ, WMQI, DB2 start
+echo "$QMNAME EAI Component Stating(WMB, WMQ, DB2 instance)"
+#$MQHA_BIN/hamqsi_start_broker_as $BKNAME $QMNAME $BKUSER $DBINST $DBNAME 
+$MQHA_BIN/hamqsi_start_broker_as $BKNAME $QMNAME $MQUSER $BKUSER
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start $QMNAME EAI Component"
+  exit $rc
+fi
+
+#WMQ Channel start
+echo "\n$QMNAME Channel Starting"
+su $MQUSER -c "$MQHA_BIN/hamqm_chl $QMNAME start"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start $QMNAME Channel"
+  exit $rc
+fi
+
+
+#MQ Trigger Monitor Start
+#echo "\n[$QMNAME] Trigger Monitor starting"
+#su $MQUSER -c "/MQHA/bin/hamqm_trm $QMNAME start"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start WMQ Trigger Monitor"
+#  exit $rc
+#fi
+
+#MTE Control Center Agent start
+echo "\nMTE Control Center Agent Starting."
+su $MQUSER -c "$MQHA_BIN/hamteagent_op start"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start MTE Agent"
+  exit $rc
+fi
+
+##ILink Server start
+#echo "\nILink Server Starting."
+#su $MQUSER -c "$MQHA_BIN/ILinkServer_start"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start ILink Server"
+#  exit $rc
+#fi
+
+##ILinkBridge start
+#echo "\nILinkBridge Starting."
+#su $MQUSER -c "$MQHA_BIN/ILinkBrdg_start"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start ILinkBridge"
+#  exit $rc
+#fi 
+
+#Waitting for starting MQ
+#sleep 120
+
+#MQe Gateway start
+#echo "\nMQe Gateway Starting."
+#su $MQUSER -c "$MQHA_BIN/hamqe_op $MQEQM start $QMNAME"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start MQe Gateway" 
+#  exit $rc
+#fi
+
+
+exit 0

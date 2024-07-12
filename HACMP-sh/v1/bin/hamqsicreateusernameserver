@@ -1,0 +1,129 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# 
+# Module: hamqsicreateusernameserver
+#  
+# Args:
+#   Arguments are the same as for mqsicreateusernameserver
+#
+# Description:
+#   This script creates an MQSI UNS so that it can run 
+#   in an HA cluster.
+#
+#   Runs as root and uses su when creating UNS
+# 
+#
+
+
+# Must be run as root
+if [ `id -u`  -ne 0 ]
+then
+  echo "Must be running as root"
+  exit 1
+fi
+
+# Save the supplied arguments - we'll need them below
+ORIG_ARGS=$*
+
+# Parse the args for $QM & $MQUSER
+while getopts :i:q: arguments
+do
+  case $arguments in
+    i) MQUSER=$OPTARG;;
+    q) QM=$OPTARG;;
+    :) echo "Missing argument to $OPTARG switch";;
+    \?) shift;; # ignore other (valid) switch and shift past its argument
+  esac
+done
+
+# Test that we have QM and MQUSER args set
+if [ -z "$QM" ]
+then
+   echo "hamqsicreateusernameserver: ERROR! No queue manager name supplied"
+   echo "hamqsicreateusernameserver: Use same args as with mqsicreateusernameserver"
+   exit 1
+fi
+
+if [ -z "$MQUSER" ]
+then
+   echo "hamqsicreateusernameserver: ERROR! No mquser supplied"
+   echo "hamqsicreateusernameserver: Use same args as with mqsicreateusernameserver"
+   exit 1
+fi
+
+
+
+# Create the UNS
+su - $MQUSER -c "mqsicreateusernameserver $ORIG_ARGS"
+if [ $? -ne "0" ]
+then
+  echo "hamqsicreateusernameserver: Error from mqsicreateusernameserver command"
+  exit 1
+fi
+
+# Now find out where the datapath of the QM is.
+DATAPATH=`./hamqsi_qm_datapath $QM`
+echo "UserNameServer directories will be moved to be under $DATAPATH"
+
+# The components/UserNameServer and registry/UserNameServer directories
+# will be moved to the QM data directory, which is on shared disk. Symbolic 
+# links are then created.
+#
+curdir=`pwd`
+
+cd /var/mqsi/components
+echo "hamqsicreateusernameserver: Moving components/UserNameServer directory to $QM/data directory"
+if [ ! -d $DATAPATH/components ]
+then
+  mkdir $DATAPATH/components
+fi
+cp -Rp UserNameServer $DATAPATH/components
+rm -fr UserNameServer
+ln -fs $DATAPATH/components/UserNameServer UserNameServer
+
+cd /var/mqsi/registry  
+echo "hamqsicreateusernameserver: Moving registry/UserNameServer directory to $QM/data directory"
+if [ ! -d $DATAPATH/registry ]
+then
+  mkdir $DATAPATH/registry
+fi
+cp -Rp UserNameServer $DATAPATH/registry
+rm -fr UserNameServer
+ln -fs $DATAPATH/registry/UserNameServer UserNameServer
+cd $curdir
+
+
+# Create an Application Monitor
+# HACMP/ES does not support passing parameters to application monitor
+# scripts. So we need to create a unique monitor script for the 
+# combination of UNS and QM. The auto-created script is called 
+# /MQHA/bin/hamqsi_applmon.UNS and it is this script which is entered
+# in the HACMP/ES configuration panels.
+#
+apmon=/MQHA/bin/hamqsi_applmon.UNS
+cat > $apmon << EOF
+#!/bin/ksh
+/MQHA/bin/hamqsi_monitor_uns_as $QM $MQUSER
+EOF
+chmod +x $apmon
+
+
+echo "hamqsicreateusernameserver:"
+echo "\t You need to run hamqsiaddunsstandby $QM $MQUSER on standby nodes"
+
+
+exit 0

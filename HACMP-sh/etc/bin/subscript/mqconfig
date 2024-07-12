@@ -1,0 +1,920 @@
+#!/bin/sh
+### NAME:      mqconfig
+###
+### VERSION:   1.1
+###
+### AUTHOR:    Justin Fries (justinf@us.ibm.com)
+###
+### COPYRIGHT:
+### 
+### (C) COPYRIGHT International Business Machines Corp. 2007-2008
+### All Rights Reserved
+### Licensed Materials - Property of IBM
+###
+### US Government Users Restricted Rights - Use, duplication or
+### disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+###
+### SYNOPSIS:
+###
+###  mqconfig [-v 7.0|6.0|5.3] [-p Project]...
+###
+###         -v: The version of WebSphere MQ: 7.0, 6.0 or 5.3
+###         -p: A Solaris 10 project name to check
+###
+### DESCRIPTION:
+###
+### This script validates kernel parameter settings on AIX, HP-UX, Linux
+### and Solaris systems against the recommendations in the "WebSphere MQ
+### Quick Beginnings Guide".  If there are any discrepancies between the
+### values in this script and those in the book, follow the book:
+###
+###   http://www.ibm.com/software/integration/wmq/library/
+###
+###
+### CAVEATS/WARNINGS:
+###
+### Successful validation by this script only confirms your system meets
+### the default recommendations.  If your system is heavily stressed, if
+### you are running many queue managers at once, or if your system hosts
+### other programs like database, you may need to increase your settings
+### beyond the default recommendations.
+###
+### Where possible this script issues a warning for parameters which are
+### lower than recommended but sufficient for a small system.  Generally
+### values at 75% or better of the recommended limit cause a warning and
+### not a failure, but be aware WebSphere MQ can fail if it exhausts the
+### resource on your system.  For further guidance see:
+###
+###   http://www.ibm.com/support/docview.wss?rs=171&uid=swg21271326
+###
+###
+### RETURNED VALUES:
+###
+###   0  - Success
+###   1  - Failure
+###
+###
+### EXAMPLES:
+###
+### 1. To check your settings for the current level of MQ:
+###
+###      mqconfig
+###
+###
+### 2. To check the group.mqm and test.mqm projects on Solaris 10:
+###
+###      mqconfig -p group.mqm -p test.mqm
+###
+###
+### 3. To check your system against the WebSphereMQ 7.0 settings:
+###
+###      mqconfig -v 7.0
+###
+### 
+### 4. To get help with the mqconfig script:
+###
+###      mqconfig -?
+###
+
+
+### This script uses different syntax on Solaris 10 and later due to the
+### use of projects for resource limits.  Choose the proper syntax now.
+
+  unset PROJLIST MQVER OSVER OPSYS
+  SYNTAX="mqconfig [-v 7.0|6.0|5.3]"
+  OPTSTR=":v:"
+
+  if [ `uname -s` = "SunOS" -a -x /usr/bin/projects ] ; then
+    if [ `uname -r | sed 's/5\.//'` -ge 10 ] ; then
+      SYNTAX="$SYNTAX [-p Project]..."
+      OPTSTR="${OPTSTR}p:"
+      OPSYS=Project
+    fi
+  fi
+
+
+### The PrintHelp function displays information about how mqconfig works
+### and addresses frequently asked questions from users.  This method is
+### invoked when a user runs 'mqconfig -?'.
+
+  PrintHelp() {
+    printf "syntax: $SYNTAX\n\n"
+
+    printf "The mqconfig script analyzes the configuration of your AIX, HP-UX, Linux or Sun\n"
+    printf "Solaris system against the values recommended by IBM in the \"WebSphere MQ Quick\n"
+    printf "Beginnings Guide\".  For each parameter mqconfig lists the limit on your system,\n"
+    printf "the IBM recommended limit, and a PASS/WARN/FAIL grade.  When possible, mqconfig\n"
+    printf "show your current resource usage including the percentage consumed.\n\n"
+
+    printf "The grade assigned to each limit is based on its proximity to the IBM limit and\n"
+    printf "also to the current usage on the system.  For example, if the IBM limit is 1024\n"
+    printf "and your system has a limit of 128, mqconfig will FAIL that parameter.  If your\n"
+    printf "system has a limit of 900 mqconfig will only WARN, while values of 1024 or more\n"
+    printf "will PASS.  The only exception is if mqconfig sees a very high usage percentage\n"
+    printf "for a parameter, in which case it may WARN or FAIL.  In such cases you may need\n"
+    printf "to configure a limit higher than the basic IBM recommendation.\n\n"
+
+    printf "By default, mqconfig checks your system against the limits for the installed MQ\n"
+    printf "version.  You can use the '-v' flag to test the limits for another version.  If\n"
+    printf "you are planning an upgrade to WebSphere MQ v7.0, for example, use the '-v 7.0'\n"
+    printf "option to check your system configuration before you begin the upgrade.\n"
+
+    echo "$OPSYS" | grep Project 1>/dev/null 2>&1 && {
+      printf "\n\nSolaris Projects\n\n"
+
+      printf "Solaris 10 does not have a single global set of kernel parameters.  Instead you\n"
+      printf "can create multiple projects, each one with its own settings.  IBM recommends a\n"
+      printf "project called 'group.mqm' for WebSphere MQ, but you can choose to run MQ under\n"
+      printf "any project(s) you wish.  Please refer to the 'newtask' command for information\n"
+      printf "on how to start your queue managers under the correct project.\n\n"
+
+      printf "On Solaris 10 you should use the '-p' option to tell mqconfig which projects to\n"
+      printf "analyze.  You only need to check projects which will run MQ queue managers.  If\n"
+      printf "you do not give a project name, mqconfig will analyze every project showing any\n"
+      printf "MQ activity.  If there is no MQ activity, mqconfig will analyze the 'group.mqm'\n"
+      printf "project, and failing that the current project.  If you see a WARN or FAIL grade\n"
+      printf "for a project not used by WebSphere MQ, you can ignore it.\n"
+    }
+  }
+
+
+### The Message function prints both error and information messages with
+### caller-supplied inserts and formats them to an 80-character line.
+
+  Message() {
+    if [ $# -ge 1 ] ; then
+      MSGID=$1; shift
+    fi
+
+    { case "${MSGID:=9999}" in
+	1000) cat <<- :END
+		syntax: $SYNTAX
+		:END
+		;;
+	1001) cat <<- :END
+		Option -$1 requires an argument.
+		:END
+		;;
+	1002) cat <<- :END
+		Option -$1 is not valid.
+		:END
+		;;
+	1003) cat <<- :END
+		WebSphere MQ $1 is not yet supported.
+		:END
+		;;
+	1004) cat <<- :END
+		Unexpected parameters: $@
+		:END
+		;;
+	1005) cat <<- :END
+		Analyzing $1 settings for WebSphere MQ $2
+		:END
+		;;
+	1006) cat <<- :END
+		This script does not support $@.
+		:END
+		;;
+	1007) cat <<- :END
+		Unable to query kernel parameter $1.
+		:END
+		;;
+	1008) cat <<- :END
+		Project $1 does not exist.
+		:END
+		;;
+	1009) cat <<- :END
+		No group.mqm project exists; Using the current project.
+		:END
+		;;
+	1010) cat <<- :END
+		No project given; Analyzing all projects with MQ activity.
+		:END
+		;;
+	1011) cat <<- :END
+		Analyzing project $@
+		:END
+		;;
+           *) cat <<- :END
+		Cannot print message: $MSGID $@
+		:END
+		;;
+      esac } | tr -d '\t' | fmt -68 | {
+        read LINE && printf "mqconfig: $LINE\n"
+        while read LINE; do
+          printf "          $LINE\n"
+        done
+    }
+  }
+
+
+### The Sum function is a helper to sum up columns of numbers, used when
+### calculating System V IPC resource usage on the system.
+
+  Sum() {
+    SUM=0
+
+    while read NUM ; do
+      SUM=`expr $SUM + $NUM`
+    done
+
+    printf "$SUM"
+  }
+
+
+### Determine the current usage of those kernel parameters for which the
+### operating system provides a method.  These results will be reflected
+### in the output as a percentage of resources consumed.  Remove leading
+### blanks from 'wc -l' output as they will otherwise cause trouble.
+
+  GetResourceUsage() {
+    PARAM=$1
+
+    case $OPSYS in
+      AIX|Solaris)         ### Check usage for both AIX and Solaris 8/9.
+        case $PARAM in
+          SHMMNI) ipcs -m 2>/dev/null | grep '^m' | wc -l | tr -d ' ';;
+          SEMMNI) ipcs -s 2>/dev/null | grep '^s' | wc -l | tr -d ' ';;
+          SEMMNS) ipcs -sa 2>/dev/null | grep '^s' | awk '{print $9}' | Sum;;
+        esac
+        ;;
+      Linux)               ### Check usage for Linux kernels.
+        case $PARAM in
+          shmmni) ipcs -m 2>/dev/null | grep '^0x' | wc -l | tr -d ' ';;
+          shmall) ipcs -u 2>/dev/null | grep 'pages allocated' | awk '{print $3}';;
+          semmni) ipcs -s 2>/dev/null | grep '^0x' | wc -l | tr -d ' ';;
+          semmns) ipcs -s 2>/dev/null | grep '^0x' | awk '{print $5}' | Sum;;
+        esac
+        ;;
+      HPUX)                ### Check usage for HP-UX kernels.
+        case $PARAM in
+           shmmni) ipcs -m 2>/dev/null | grep '^m' | wc -l | tr -d ' ';;
+           semmni) ipcs -s 2>/dev/null | grep '^s' | wc -l | tr -d ' ';;
+           semmns) ipcs -sa 2>/dev/null | grep '^s' | awk '{print $9}' | Sum;;
+        esac
+        ;;
+      SolarisProject)      ### Check usage for Solaris 10+ projects.
+        case $PARAM in
+          max-shm-ids) ipcs -mJ 2>/dev/null | grep -w $PROJECT | grep '^m' | wc -l | tr -d ' ';;
+          max-sem-ids) ipcs -sJ 2>/dev/null | grep -w $PROJECT | grep '^s' | wc -l | tr -d ' ';;
+        esac
+        ;;
+    esac
+  }
+
+
+### The DisplayLimit function compares the current value of an operating
+### system parameter to the limit recommended by IBM, and where possible
+### shows the current resource usage.  In addition to the IBM limit this
+### function accepts an optional warning limit, expressed as an absolute
+### value or as a percentage of the IBM limit.  If this is more than the
+### IBM limit the parameter is assumed to be inverted (like SHMMIN).  By
+### negating all of the numbers the same pass/warn/fail logic can handle
+### both cases.  If the IBM limit is 'AUTO' the parameter is self-tuning
+### but if there is no limit given the parameter not displayed.  Finally
+### this function prints the parameter name and value, its current usage
+### (both value and percentage, if possible), the IBM recommended limit,
+### and a score based on these general rules:
+###
+###   PASS: Meets or exceeds the IBM value and usage is less than 75%
+###   FAIL: Much less than the IBM value or usage is greater than 95%
+###   WARN: Limit approaches the IBM value or usage is between 75-95%
+
+  DisplayLimit() {
+    PARAM=$1
+    UNITS=$2
+    VALUE=$3
+    LIMIT=$4
+    ALERT=$5
+
+    if [ -z "$LIMIT" -o -z "$VALUE" ] ; then
+      return
+    fi
+
+    CURRENT=`GetResourceUsage $PARAM`
+
+    if [ $LIMIT = AUTO ] ; then
+      printf "  %-19s %-34s %-17s %b\n" "$PARAM" "${CURRENT:=???} $UNITS" "[Auto Tuned]" $PASS
+      return
+    elif [ -n "$CURRENT" ] ; then
+      PERCENT=`echo "$CURRENT * 100 / $VALUE" | bc 2>/dev/null`
+      MESSAGE=`printf "%-26s %-7s" "$CURRENT of $VALUE $UNITS" "($PERCENT%)"`
+    else
+      PERCENT=0
+      MESSAGE=`printf "%-34s" "$VALUE $UNITS"`
+    fi
+
+    printf "  %-19s %-34s %-17s " "$PARAM" "$MESSAGE" "IBM:$LIMIT"
+
+    case ${ALERT:=$LIMIT} in
+      *%) ALERT=`echo "$LIMIT * $ALERT" | sed 's+%+ / 100+' | bc 2>/dev/null`;;
+    esac
+
+
+    ### Unfortunately HP-UX /usr/bin/test and /usr/bin/expr can overflow
+    ### silently at 2^31.  To avoid this we check the ratio of the value
+    ### on the system to the alert value, and for "inverse limits" it is
+    ### necessary to invert this ratio (sigh).  If the overflow issue is
+    ### resolved, the original PASS/WARN/FAIL test can be restored:
+    ###
+    ###   if [ $VALUE -lt $ALERT -o $PERCENT -gt 95 ] ; then
+    ###     printf "%b\n" $FAIL
+    ###   elif [ $VALUE -ge $LIMIT -a $PERCENT -lt 75 ] ; then
+    ###     printf "%b\n" $PASS
+    ###   else
+    ###     printf "%b\n" $WARN
+    ###   fi
+    ###  
+
+    if [ $ALERT -gt $LIMIT ] ; then
+      VALUE=-$VALUE
+      LIMIT=-$LIMIT
+      ALERT=-$ALERT
+      RATIO=`echo "$ALERT / $VALUE" | bc 2>/dev/null`
+    else
+      RATIO=`echo "$VALUE / $ALERT" | bc 2>/dev/null`
+    fi
+
+    if [ $RATIO -eq 0 -o $PERCENT -gt 95 ] ; then
+      printf "%b\n" $FAIL
+    elif [ $RATIO -gt 0 -a $PERCENT -lt 75 ] ; then
+      printf "%b\n" $PASS
+    else
+      printf "%b\n" $WARN
+    fi
+  }
+
+
+### AIX is special in that the kernel has no parameters for System V IPC
+### resources; Instead, AIX supports such large values that WebSphere MQ
+### cannot exhaust them, even with databases and other IPC users running
+### on the same system.  This function prints the current usage of these
+### parameters before checking other settings on the system.
+
+  AnalyzeAIX() {
+    IBM_MAXUPROC=1024
+
+    SHMMNI=`GetResourceUsage SHMMNI`
+    SEMMNI=`GetResourceUsage SEMMNI`
+    SEMMNS=`GetResourceUsage SEMMNS`
+    MAXUPROC=`lsattr -El sys0 -a maxuproc | awk '{print $2}'`
+
+    printf "\nSystem V Semaphores\n"
+    DisplayLimit SEMMNI   sets       0           "AUTO"
+    DisplayLimit SEMMNS   semaphore  0           "AUTO"
+
+    printf "\nSystem V Shared Memory\n"
+    DisplayLimit SHMMNI   sets       0           "AUTO"
+
+    printf "\nOther Settings\n"
+    DisplayLimit MAXUPROC processes "$MAXUPROC" "$IBM_MAXUPROC" 50%
+  }
+
+
+
+### HP-UX 11 provides the kctune command for querying and setting kernel
+### parameters, or on earlier releases the kmtune command.  As the value
+### may be in hex or octal, use bc to normalize it to decimal.
+
+  GetHPUXValue() {
+    PARAM=$1
+    VALUE=
+
+    if [ -x /usr/sbin/kctune ] ; then
+      VALUE=`/usr/sbin/kctune $PARAM 2>/dev/null | grep "^$PARAM" | awk '{print $2}' | tr [:lower:] [:upper:]`
+    elif [ -x /usr/sbin/kmtune ] ; then
+      VALUE=`/usr/sbin/kmtune -q $PARAM 2>/dev/null | grep "^$PARAM" | awk '{print $2}' | tr [:lower:] [:upper:]`
+    fi
+
+    case $VALUE in
+      0[xX]*) echo "ibase=16; $VALUE" | sed 's/0[xX]//' | bc 2>/dev/null;;
+          0*) echo "ibase=8;  $VALUE" | bc 2>/dev/null;;
+           *) echo "$VALUE";;
+    esac
+  }
+
+
+### Set the default kernel parameter values for the current WebSphere MQ
+### version on HP-UX using the "Quick Beginnings Guide" recommendations.
+### First set up the values commonly used by MQ, then tweak them for the
+### product version.  Query the current values and print a summary.
+
+  AnalyzeHPUX() {
+    IBM_SEMA=1
+    IBM_SEMMNI=1024
+    IBM_SEMMNS=16384
+    IBM_SEMMSL=100;        IBM_SEMMSL_MIN=64
+    IBM_SEMMNU=16384
+    IBM_SEMUME=256
+    IBM_SEMAEM=16384;      IBM_SEMAEM_MIN=1
+    IBM_SEMVMX=32767;      IBM_SEMVMX_MIN=1
+    IBM_SEMMAP=`expr $IBM_SEMMNI + 2`
+
+    IBM_SHMEM=1
+    IBM_SHMMNI=1024
+    IBM_SHMSEG=1024
+    IBM_SHMMAX=536870912;  IBM_SHMMAX_MIN=33554432
+
+    IBM_MAXUSERS=32
+    IBM_MAXUPRC=1024
+    IBM_MAX_THREAD_PROC=66
+    IBM_MAXFILES=10000
+    IBM_MAXFILES_LIM=10000
+    IBM_NFILE=10000
+
+    IBM_NKTHREAD=`GetHPUXValue nkthread`
+    IBM_NCALLOUT=`eval expr $IBM_NKTHREAD + 16`
+
+    case $MQVER in
+      7.0) IBM_MAXDSIZ_MIN=1073741824
+           IBM_MAXDSIZ64_MIN=1073741824
+           IBM_MAXSSIZ_MIN=8388608
+           IBM_MAXSSIZ64_MIN=8388608;;
+      6.0) ;;
+      5.3) IBM_SEMMNU=2048
+           IBM_MAXFILES=1024
+           IBM_MAXFILES_LIM=1024;;
+    esac
+
+    UNIT[0]="(disabled)"
+    UNIT[1]="(enabled)"
+
+    SHMEM=`GetHPUXValue shmem`
+    SHMMNI=`GetHPUXValue shmmni`
+    SHMSEG=`GetHPUXValue shmseg`
+    SHMMAX=`GetHPUXValue shmmax`
+
+    SEMA=`GetHPUXValue sema`
+    SEMMNI=`GetHPUXValue semmni`
+    SEMMNS=`GetHPUXValue semmns`
+    SEMMSL=`GetHPUXValue semmsl`
+    SEMMNU=`GetHPUXValue semmnu`
+    SEMUME=`GetHPUXValue semume`
+    SEMAEM=`GetHPUXValue semaem`
+    SEMVMX=`GetHPUXValue semvmx`
+
+    MAXUSERS=`GetHPUXValue maxusers`
+    MAXUPRC=`GetHPUXValue maxuprc`
+    MAX_THREAD_PROC=`GetHPUXValue max_thread_proc`
+    MAXFILES=`GetHPUXValue maxfiles`
+    MAXFILES_LIM=`GetHPUXValue maxfiles_lim`
+    MAXDSIZ=`GetHPUXValue maxdsiz`
+    MAXDSIZ64=`GetHPUXValue maxdsiz_64bit`
+    MAXSSIZ=`GetHPUXValue maxssiz`
+    MAXSSIZ64=`GetHPUXValue maxssiz_64bit`
+    NFILE=`GetHPUXValue nfile`
+    NCALLOUT=`GetHPUXValue ncallout`
+
+    printf "\nSystem V Semaphores\n"
+    DisplayLimit sema "${UNIT[${SEMA:-1}]}"    "$SEMA"            "$IBM_SEMA"
+    DisplayLimit semmni sets                   "$SEMMNI"          "$IBM_SEMMNI"           75% 
+    DisplayLimit semmns semaphores             "$SEMMNS"          "$IBM_SEMMNS"           75%
+    DisplayLimit semmsl semaphores             "$SEMMSL"          "$IBM_SEMMSL"           "$IBM_SEMMSL_MIN"
+    DisplayLimit semmnu undos                  "$SEMMNU"          "$IBM_SEMMNU"           75%
+    DisplayLimit semume undos                  "$SEMUME"          "$IBM_SEMUME"
+    DisplayLimit semaem units                  "$SEMAEM"          "$IBM_SEMAEM"           "$IBM_SEMAEM_MIN"
+    DisplayLimit semvmx units                  "$SEMVMX"          "$IBM_SEMVMX"           "$IBM_SEMVMX_MIN"
+
+    printf "\nSystem V Shared Memory\n"
+    DisplayLimit shmem "${UNIT[${SHMEM:-1}]}"  "$SHMEM"           "$IBM_SHMEM"
+    DisplayLimit shmmni sets                   "$SHMMNI"          "$IBM_SHMMNI"           75%
+    DisplayLimit shmmax bytes                  "$SHMMAX"          "$IBM_SHMMAX"           "$IBM_SHMMAX_MIN"
+    DisplayLimit shmseg sets                   "$SHMSEG"          "$IBM_SHMSEG"           75%
+
+    printf "\nOther Settings\n"
+    DisplayLimit maxusers        users         "$MAXUSERS"        "$IBM_MAXUSERS" 
+    DisplayLimit maxuprc         processes     "$MAXUPRC"         "$IBM_MAXUPRC"          50%
+    DisplayLimit max_thread_proc threads       "$MAX_THREAD_PROC" "$IBM_MAX_THREAD_PROC"
+    DisplayLimit maxdsiz         bytes         "$MAXDSIZ"         "$IBM_MAXDSIZ_MIN"      60%
+    DisplayLimit maxdsiz_64bit   bytes         "$MAXDSIZ64"       "$IBM_MAXDSIZ64_MIN"
+    DisplayLimit maxssiz         bytes         "$MAXSSIZ"         "$IBM_MAXSSIZ_MIN"
+    DisplayLimit maxssiz_64bit   bytes         "$MAXSSIZ64"       "$IBM_MAXSSIZ64_MIN"
+    DisplayLimit maxfiles        files         "$MAXFILES"        "$IBM_MAXFILES"         75%
+    DisplayLimit maxfiles_lim    files         "$MAXFILES_LIM"    "$IBM_MAXFILES_LIM"     75%
+    DisplayLimit nfile           files         "$NFILE"           "$IBM_NFILE"            75%
+    DisplayLimit ncallout        callouts      "$NCALLOUT"        "$IBM_NCALLOUT"         75%
+  }
+
+
+### Most Linux systems today provide the sysctl program for querying the
+### value of kernel parameters, but if that is not available they may be
+### read from the proc filesystem.  The value string may contain several
+### fields, so it is printed as a string for the caller to dissect.
+
+  GetLinuxValue() {
+    PARAM=$1
+    PPATH=$2
+    VALUE=
+
+    if [ -x /sbin/sysctl ] ; then
+      VALUE=`/sbin/sysctl -n $PARAM 2>/dev/null`
+    fi
+
+    if [ -z "$VALUE" -a -n "$PROCPATH" ] ; then
+      PROC=`mount -t proc 2>/dev/null | awk '{print $3}'`
+      if [ -n "$PROC" -a -r "$PROC/$PROCPATH" ] ; then
+        VALUE=`cat "$PROC/$PROCPATH"`
+      fi
+    fi
+
+    printf "$VALUE"
+  }
+
+
+### If the Linux system is using PAM, we need to validate limits for mqm
+### in the /etc/security/limits.conf file.  Both the soft and hard limit
+### should be set according to the "Quick Beginnings Guide" values; Take
+### the lower of the two found in the file.  This test is not conclusive
+### since PAM might not be in use and limits might be set elsewhere, but
+### as a best-effort check it will do.
+
+  GetLinuxPAMLimit() {
+    PARAM=$1
+
+    grep -w mqm /etc/security/limits.conf | while read USER TYPE ITEM RLIM ; do
+      if [ "$USER" = mqm -a "$ITEM" = $PARAM -a ${RLIM:=0} -le ${VALUE:=$RLIM} ] ; then
+        printf "$RLIM\n"
+      fi
+    done | sort -rn 2>/dev/null | head -n 1 2>/dev/null
+  }
+
+
+### Set the default kernel parameter values for the current WebSphere MQ
+### version on Linux using the "Quick Beginnings Guide" recommendations.
+### The Linux manual is a bit sketchy on specifics so some defaults have
+### been appropriated from other platforms.  Before version 7.0 IBM made
+### no recommendation for the Linux-specific SHMALL parameter, so we use
+### the default Linux kernel limit of "SHMMAX / PAGE_SIZE * SHMMNI / 16"
+### for this parameter.  The 7.0 guide does suggest an msgmni value, but
+### that is an error.  Query the current settings and print a summary.
+
+  AnalyzeLinux() {
+    IBM_SEMMSL=128
+    IBM_SEMMNS=16384
+    IBM_SEMOPM=5
+    IBM_SEMMNI=1024
+
+    IBM_SHMMNI=1024
+    IBM_SHMMAX=268435456;  IBM_SHMMAX_MIN=33554432
+    PAGE_SIZE=`getconf PAGE_SIZE 2>/dev/null` || PAGE_SIZE=4096
+    IBM_SHMALL=`expr $IBM_SHMMAX / $PAGE_SIZE \* $IBM_SHMMNI / 16`
+
+    IBM_FILEMAX=32768
+    IBM_NOFILE=10240
+    IBM_NPROC=4090
+
+    case $MQVER in
+      7.0) IBM_SEMMSL=500
+           IBM_SEMMNS=256000
+           IBM_SEMOPM=250
+           IBM_SHMMNI=4096
+           IBM_SHMALL=2097152
+           IBM_KEEPALIVE=300;;
+    esac
+
+    SHMMNI=`GetLinuxValue kernel.shmmni sys/kernel/shmmni`
+    SHMALL=`GetLinuxValue kernel.shmall sys/kernel/shmall`
+    SHMMAX=`GetLinuxValue kernel.shmmax sys/kernel/shmmax`
+
+    SEM=`GetLinuxValue kernel.sem sys/kernel/sem`
+    SEMMSL=`echo "$SEM" | awk '{print $1}'`
+    SEMMNS=`echo "$SEM" | awk '{print $2}'`
+    SEMOPM=`echo "$SEM" | awk '{print $3}'`
+    SEMMNI=`echo "$SEM" | awk '{print $4}'`
+
+    FILEMAX=`GetLinuxValue fs.file-max sys/fs/file-max`
+    NOFILE=`GetLinuxPAMLimit nofile`
+    NPROC=`GetLinuxPAMLimit nproc`
+    KEEPALIVE=`GetLinuxValue net.ipv4.tcp_keepalive_time`
+
+    printf "\nSystem V Semaphores\n"
+    DisplayLimit "semmsl (sem:1)"    semaphores  "$SEMMSL"    "$IBM_SEMMSL"
+    DisplayLimit "semmns (sem:2)"    semaphores  "$SEMMNS"    "$IBM_SEMMNS"     75%
+    DisplayLimit "semopm (sem:3)"    operations  "$SEMOPM"    "$IBM_SEMOPM"
+    DisplayLimit "semmni (sem:4)"    sets        "$SEMMNI"    "$IBM_SEMMNI"     75%
+
+    printf "\nSystem V Shared Memory\n"
+    DisplayLimit shmmax              bytes       "$SHMMAX"    "$IBM_SHMMAX"     "$IBM_SHMMAX_MIN"
+    DisplayLimit shmmni              sets        "$SHMMNI"    "$IBM_SHMMNI"     75%
+    DisplayLimit shmall              pages       "$SHMALL"    "$IBM_SHMALL"     50%
+
+    printf "\nOther Settings\n"
+    DisplayLimit file-max            files       "$FILEMAX"   "$IBM_FILEMAX"    75%
+    DisplayLimit nofile              files       "$NOFILE"    "$IBM_NOFILE"     75%
+    DisplayLimit nproc               processes   "$NPROC"     "$IBM_NPROC"      75%
+    DisplayLimit tcp_keepalive_time  seconds     "$KEEPALIVE" "$IBM_KEEPALIVE"  120
+  }
+
+
+### In Solaris releases before 10 the sysdef command displays the kernel
+### parameter configuration.  Since the command is not particularly fast
+### the values are extracted from saved sysdef output.
+
+  GetSolarisValue() {
+    PARAM=$1
+
+    VALUE=`echo "$SYSDEF" | grep "($PARAM)" | awk '{print $1}'`
+    printf "$VALUE"
+  }
+
+
+### Set the default kernel parameter values for the current WebSphere MQ
+### version on Solaris 8 or Solaris 9 using the "Quick Beginnings Guide"
+### recommendations.  Query the current values and print a summary.  For
+### the rlim_fd_cur and rlim_fd_max limits, the only possible to test is
+### to query the limits for the current user.
+
+  AnalyzeSolaris() {
+    IBM_SEMMNI=1024
+    IBM_SEMMNS=16384
+    IBM_SEMMSL=100;        IBM_SEMMSL_MIN=64
+    IBM_SEMMNU=16384
+    IBM_SEMUME=256
+    IBM_SEMAEM=16384;      IBM_SEMAEM_MIN=1
+    IBM_SEMVMX=32767;      IBM_SEMVMX_MIN=1
+    IBM_SEMOPM=100;        IBM_SEMOPM_MIN=5
+    IBM_SEMMAP=`expr $IBM_SEMMNI + 2`
+
+    IBM_SHMMNI=1024
+    IBM_SHMSEG=1024
+    IBM_SHMMAX=4294967295; IBM_SHMMAX_MIN=33554432
+    IBM_SHMMIN=1;          IBM_SHMMIN_MAX=1000
+
+    IBM_MAXUPRC=1024
+    IBM_FD_CUR=10000
+    IBM_FD_MAX=10000
+
+    case $MQVER in
+      5.3) IBM_SEMMNU=2048
+           IBM_FD_CUR=1024
+           IBM_FD_MAX=1024;;
+    esac
+
+    SYSDEF=`/usr/sbin/sysdef -i 2>/dev/null`
+    SHMMNI=`GetSolarisValue SHMMNI`
+    SHMSEG=`GetSolarisValue SHMSEG`
+    SHMMAX=`GetSolarisValue SHMMAX`
+    SHMMIN=`GetSolarisValue SHMMIN`
+    SEMMNI=`GetSolarisValue SEMMNI`
+    SEMMNS=`GetSolarisValue SEMMNS`
+    SEMMSL=`GetSolarisValue SEMMSL`
+    SEMMNU=`GetSolarisValue SEMMNU`
+    SEMUME=`GetSolarisValue SEMUME`
+    SEMAEM=`GetSolarisValue SEMAEM`
+    SEMVMX=`GetSolarisValue SEMVMX`
+    SEMOPM=`GetSolarisValue SEMOPM`
+
+    MAXUPRC=`GetSolarisValue v.v_maxup`
+    FD_CUR=`ulimit -Sn 2>/dev/null`
+    FD_MAX=`ulimit -Hn 2>/dev/null`
+
+    printf "\nSystem V Semaphores\n"
+    DisplayLimit SEMMNI      sets        "$SEMMNI"         "$IBM_SEMMNI"  75%
+    DisplayLimit SEMMNS      semaphores  "$SEMMNS"         "$IBM_SEMMNS"  75%
+    DisplayLimit SEMMSL      semaphores  "$SEMMSL"         "$IBM_SEMMSL"  "$IBM_SEMMSL_MIN"
+    DisplayLimit SEMMNU      undos       "$SEMMNU"         "$IBM_SEMMNU"  75%
+    DisplayLimit SEMUME      undos       "$SEMUME"         "$IBM_SEMUME"
+    DisplayLimit SEMAEM      units       "$SEMAEM"         "$IBM_SEMAEM"  "$IBM_SEMAEM_MIN"
+    DisplayLimit SEMVMX      units       "$SEMVMX"         "$IBM_SEMVMX"  "$IBM_SEMVMX_MIN"
+    DisplayLimit SEMOPM      operations  "$SEMOPM"         "$IBM_SEMOPM"  "$IBM_SEMOPM_MIN"
+
+    printf "\nSystem V Shared Memory\n"
+    DisplayLimit SHMMNI      sets        "$SHMMNI"         "$IBM_SHMMNI"  75%
+    DisplayLimit SHMMAX      bytes       "$SHMMAX"         "$IBM_SHMMAX"  "$IBM_SHMMAX_MIN"
+    DisplayLimit SHMSEG      sets        "$SHMSEG"         "$IBM_SHMSEG"
+    DisplayLimit SHMMIN      bytes       "$SHMMIN"         "$IBM_SHMMIN"  "$IBM_SHMMIN_MAX"
+
+    printf "\nOther Settings\n"
+    DisplayLimit maxuprc     processes   "$MAXUPRC"        "$IBM_MAXUPRC" 50%
+    DisplayLimit rlim_fd_cur descriptors "${FD_CUR:=256}"  "$IBM_FD_CUR"  75%
+    DisplayLimit rlim_fd_max descriptors "${FD_MAX:=1024}" "$IBM_FD_MAX"  75%
+  }
+
+
+### In Solaris 10 and later, resource limits are managed using projects.
+### Since the prctl command can't show limits of an inactive project use
+### the projects command to query the project settings.  Fill in Solaris
+### default values for any limit that is not explicitly set.
+
+  GetSolarisProjectValue() {
+    PARAM=$1
+
+    VALUE=`projects -l $PROJECT | grep "${PARAM}=" | sed 's/^.*=//' | tr ',' ' ' | awk '{print $2}'`
+
+    if [ -z "$VALUE" ] ; then
+      case $PARAM in
+        process.max-file-descriptor) VALUE=$SUN_MAXFDS;;
+                project.max-shm-ids) VALUE=$SUN_SHMMNI;;
+             project.max-shm-memory) VALUE=$SUN_SHMMAX;;
+                project.max-sem-ids) VALUE=$SUN_SEMMNI;;
+              process.max-sem-nsems) VALUE=$SUN_SEMMSL;;
+                process.max-sem-ops) VALUE=$SUN_SEMOPM;;
+      esac
+    fi
+
+    printf "$VALUE"
+  }
+
+
+### Set the default resource limits for the current WebSphere MQ version
+### on Solaris 10 based on the "Quick Beginnings Guide" recommendations.
+### Query the limits of the projects selected by the user.  If none were
+### given, query all projects which have mqm-owned IPC resources.  If no
+### mqm resources exist query the group.mqm project, and if that doesn't
+### exist, the current project.  Use the Sun defaults for any limit that
+### has not been set in the project, bearing in mind that max-shm-memory
+### is typically based on the total physical memory present.  
+
+  AnalyzeSolarisProject() {
+    if [ -z "$PROJLIST" ] ; then
+      PROJLIST=`ipcs -J | grep '^[mqs]' | sed 's/^./& /' |
+                  while read X X X X USER GROUP PROJECT X ; do
+                    if [ $USER = mqm -o $GROUP = mqm ] ; then
+                      printf "$PROJECT\n"
+                    fi
+                done | sort -u`
+
+      if [ -n "$PROJLIST" ] ; then
+        Message 1010
+      else
+        if `projects -l group.mqm 1>/dev/null 2>&1` ; then
+          PROJLIST=group.mqm
+        else
+          PROJLIST=`id -p | sed 's/^.*projid=.*(//' | sed 's/).*//'`
+          Message 1009
+        fi
+      fi
+    fi
+
+    IBM_SEMMNI=1024
+    IBM_SEMMSL=100;         IBM_SEMMSL_MIN=64
+    IBM_SEMOPM=100;         IBM_SEMOPM_MIN=5
+
+    IBM_SHMMNI=1024
+    IBM_SHMMAX=4294967296;  IBM_SHMMAX_MIN=33445532
+
+    IBM_MAXFDS=10000
+
+    case $MQVER in
+      5.3) IBM_SHMMAX=4294967295;;
+    esac
+
+    OFFSET=""
+    MEMORY=`/usr/sbin/prtconf | grep '^Memory size:' | sed 's/Megabytes/\\\* 1048576/' |
+           sed 's/Gigabytes/\\\* 1073741824/' | sed 's/.*://'`
+
+    case $OSVER in
+      10) SUN_SEMMNI=128
+          SUN_SEMMSL=512
+          SUN_SEMOPM=512
+          SUN_SHMMNI=128
+          SUN_SHMMAX=`eval expr $MEMORY / 4`
+          SUN_MAXFDS=256
+          ;;
+    esac
+
+    for PROJECT in ${PROJLIST:=default} ; do
+      printf "$OFFSET"
+
+      projects -l $PROJECT 1>/dev/null 2>&1 || {
+        Message 1008 $PROJECT
+        continue
+      }
+
+      Message 1011 $PROJECT
+      SHMMNI=`GetSolarisProjectValue project.max-shm-ids`
+      SHMMAX=`GetSolarisProjectValue project.max-shm-memory`
+      SEMMNI=`GetSolarisProjectValue project.max-sem-ids`
+      SEMMSL=`GetSolarisProjectValue process.max-sem-nsems`
+      SEMOPM=`GetSolarisProjectValue process.max-sem-ops`
+      MAXFDS=`GetSolarisProjectValue process.max-file-descriptor`
+
+      printf "\n$PROJECT: System V Semaphores\n"
+      DisplayLimit max-sem-ids         sets        "$SEMMNI" "$IBM_SEMMNI" 75%
+      DisplayLimit max-sem-nsems       semaphores  "$SEMMSL" "$IBM_SEMMSL" "$IBM_SEMMSL_MIN"
+      DisplayLimit max-sem-ops         operations  "$SEMOPM" "$IBM_SEMOPM" "$IBM_SEMOPM_MIN"
+
+      printf "\n$PROJECT: System V Shared Memory\n"
+      DisplayLimit max-shm-ids         sets        "$SHMMNI" "$IBM_SHMMNI" 75%
+      DisplayLimit max-shm-memory      bytes       "$SHMMAX" "$IBM_SHMMAX" "$IBM_SHMMAX_MIN"
+
+      printf "\n$PROJECT: Other Settings\n"
+      DisplayLimit max-file-descriptor descriptors "$MAXFDS" "$IBM_MAXFDS" 75%
+      OFFSET="\n\n"
+    done
+  }
+
+
+### Parse the command line to find the version of WebSphere MQ for which
+### the kernel parameter analysis should be done.  This is useful before
+### installing or upgrading WebSphere MQ; By default this script queries
+### the WebSphere MQ version currently installed.  Be aware that Solaris
+### getopts does not appear to update OPTARG for syntax errors.
+
+  while getopts $OPTSTR OPT ; do
+    case $OPT in
+      \:) if [ `uname -s` != "SunOS" ] ; then
+            Message 1001 $OPTARG
+          fi
+
+          Message 1000 && exit 1;;
+
+      \?) PrintHelp
+          exit 1;;
+
+       p) if [ ${PROJLIST:=$OPTARG} != $OPTARG ] ; then
+            PROJLIST="$PROJLIST\n$OPTARG"
+          fi;;
+
+       v) if [ ${MQVER:=$OPTARG} != $OPTARG ] ; then
+            Message 1000 && exit 1
+          fi;;
+    esac
+  done
+
+
+### Make sure there are no dangling arguments.  Based on the environment
+### set up the text used to show pass, warning and failure conditions.
+
+  if [ $OPTIND -le $# ] ; then
+    shift `expr $OPTIND - 1`
+    Message 1004 "$@" && exit 1
+  fi
+
+  if [ -t 1 ] ; then
+    PASS="\033[32mOK\033[m"
+    WARN="\033[33mWARN\033[m"
+    FAIL="\033[31mFAIL\033[m"
+  else
+    PASS="OK"
+    WARN="WARN"
+    FAIL="FAIL"
+  fi
+
+
+### If no WebSphere MQ version was provided, use the currently installed
+### version, or if none is installed, the latest available version.
+
+  if [ -z "$MQVER" ] ; then
+    PATH=$PATH:/opt/mqm/bin:/usr/mqm/bin
+    MQVER=`dspmqver -bp 1 -f 2 2>/dev/null`
+  fi
+
+  case ${MQVER:=7.0} in
+    7*|[vV]7*) MQVER=7.0;;
+    6*|[vV]6*) MQVER=6.0;;
+    5*|[vV]5*) MQVER=5.3;;
+            *) Message 1003 $MQVER && exit 1;;
+  esac
+
+
+### Determine the operating system name and version as these will affect
+### how the kernel is tuned.  The OPSYS name used internally may include
+### a suffix (like "SolarisProject") in order to pick up a different set
+### of analysis functions.
+
+  case `uname -s` in
+      AIX) OPSYS="AIX$OPSYS"
+           OSVER="`uname -v`.`uname -r`"
+           Message 1005 "AIX $OSVER (`uname -p`)" "$MQVER";;
+
+    HP-UX) OPSYS="HPUX$OPSYS"
+           OSVER=`uname -r`
+           if [ ! -x /usr/contrib/bin/machinfo ] ; then
+             CHIP=PA-RISC
+           elif [ -n "`/usr/contrib/bin/machinfo 2>/dev/null | grep -i PA-RISC`" ] ; then
+             CHIP=PA-RISC
+           fi
+
+           Message 1005 "HP-UX $OSVER (${CHIP:=Itanium})" "$MQVER";;
+
+    Linux) OPSYS="Linux$OPSYS"
+           OSVER=`uname -r`
+           if [ -x /usr/bin/lsb_release ] ; then
+             DIST=`/usr/bin/lsb_release -sd 2>/dev/null | tr -d \"`
+           elif [ -r /etc/redhat-release ] ; then
+             DIST=`head -1 /etc/redhat-release 2>/dev/null`
+           elif [ -r /etc/SuSE-release ] ; then
+             DIST=`head -1 /etc/SuSE-release 2>/dev/null`
+           elif [ -r /etc/UnitedLinux-release ] ; then
+             DIST=`head -1 /etc/UnitedLinux-release 2>/dev/null`
+           else
+             DIST=`cat /etc/*-release 2>/dev/null | head -1`
+           fi
+
+           Message 1005 "${DIST:=Unknown Linux (`uname -m`, $OSVER)}" "$MQVER";;
+
+    SunOS) OPSYS="Solaris$OPSYS"
+           OSVER=`uname -r | sed 's/5\.//'`
+           Message 1005 "Solaris $OSVER (`uname -p`)" "$MQVER";;
+
+        *) Message 1006 `uname -s` && exit 1;;
+  esac
+
+
+### Call the appropriate function to analyze the operating system values
+### and print a summary for the user, then exit nicely.
+
+  eval Analyze$OPSYS
+  exit 0
+

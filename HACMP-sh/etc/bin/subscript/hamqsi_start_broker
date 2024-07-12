@@ -1,0 +1,144 @@
+#!/bin/ksh
+# %Z% %W%         %I%  %E% %U%       
+# 
+# Licensed Materials - Property of IBM                             
+#                                                                  
+# (C) Copyright IBM Corp. 2006 All Rights Reserved.                
+#                                                                  
+# IC91: High Availability for WebSphere Message Broker on Distributed Platforms
+#
+# PLEASE NOTE - This script is supplied "AS IS" with no
+#               warranty or liability. It is not part of
+#               any product. Please ensure that you read
+#               and understand it before you run it. Make
+#               sure that by running it you will not
+#               overwrite or delete any important data.
+#
+# Module:
+#   hamqsi_start_broker
+#
+# Args:
+#   BROKER = name of broker to start
+#
+# Description:
+#   This script attempts to start the MQSI Broker
+#
+#   Runs as the userid which runs broker, and must have 
+#   the user's environment (i.e. invoke from "su - $MQUSER ..")
+#
+
+BROKER=$1
+
+if [ -z "$BROKER" ]
+then
+  echo "hamqsi_start_broker: ERROR! No Broker name supplied"
+  echo "   Usage: hamqsi_start_broker <BROKER>"
+  exit 1
+fi
+
+# Ensure that the broker is not already running. In this test
+# we look for any broker-related processes, which may have
+# been left around after a previous failure. Any that remain
+# must now be terminated. This is a brutal means of mopping 
+# up broker processes.
+# We stop the processes in the following order:
+#   bipservice       - first so it cannot issue restarts
+#   bipbroker        - next for same reason
+#   biphttplistener
+#   DataFlowEngines  - last
+#
+
+
+#-----------------------------------------------------------#
+# Broker Process Check                                      #
+# 메인 프로세스(bipservice) 유/무만 체크한다                #
+# 메인 프로세스가 존재하지 않고, 기타  프로세스 존재시      #
+# kill -9 로 종료 시킨다(비정상 상태이므로)                 #
+#-----------------------------------------------------------#
+cnt=`ps -ef | grep "bipservice $BROKER" | grep -v grep | wc -l`
+if [ $cnt -eq 0 ]
+then 
+  for process in bipservice bipbroker biphttplistener DataFlowEngine
+  do
+    ps -ef | grep "$process $BROKER" | grep -v grep | awk '{print $2}'| xargs kill -9 > /dev/null 2>&1
+  done  
+fi
+
+#-----------------------------------------------------------#
+# Start Broker                                              #
+#-----------------------------------------------------------#
+mqsistart $BROKER
+rc=$?
+if [ $rc -ne 0 ]
+then 
+  if [ $rc -eq 18 ]
+  then
+    echo ""  
+    echo "mqsistart command return code [$rc]"  
+    echo "이미 브로커가 실행중입니다."
+    echo "계속 진행하려면 브로커 종료후 다시 시도하십시요"
+  else
+    echo ""
+    echo "mqsistart command return code [$rc]"
+    echo "Bad result from mqsistart for $BROKER"
+    echo "이 메세지가 해결되지 않을 경우 MB Admin 또는 Engineer 에게 연락바랍니다.\n"
+  fi
+  exit 1
+fi
+
+# Check to see if the broker service has started. This loop 
+# uses a fixed online timeout of approx. 10 seconds.
+TIMED_OUT=yes
+i=0
+while [ $i -lt 10 ]
+do
+  # Check for Broker start. We look for bipservice and 
+  # bipbroker to be running; there may be no message flows
+  # deployed.
+  # Look to see whether bipservice is running
+  cnt=`ps -ef | grep "bipservice $BROKER" | grep -v grep | wc -l`
+  if [ $cnt -gt 0 ]
+  then
+    # Look to see whether bipbroker is running
+    cnt=`ps -ef | grep "bipbroker $BROKER" | grep -v grep | wc -l`
+    if [ $cnt -gt 0 ]
+    then
+      # Broker is online
+      TIMED_OUT=no
+      break  # out of timing loop
+    fi
+  fi
+  # Manage the loop counter
+  i=`expr $i + 1`
+  sleep 1
+done
+
+#-----------------------------------------------------------#
+# mqsistart 실행 결과 체크                                  #
+#-----------------------------------------------------------#
+if [ ${TIMED_OUT} = "yes" ]
+then 
+  echo "hamqsi_start_broker: Broker service failed to start: " $BROKER
+  exit 1
+else
+  # Broker was started and came online within timeout.
+  # Launch post-online script in background. We are running
+  # as the broker userid and run the script as this userid.
+  # This is always done in the background so we don't delay the
+  # HA methods, which need to stay responsive. A synchronous
+  # call to the user method might delay (indefinitely) the
+  # completion of our start_broker method, which would upset
+  # other actions being taken by the cluster.
+
+  # Is there an executable method for us to run?
+  if [ -x ${HASCRIPT_DIR}/bin/subscript/rc.mqsi ]
+  then
+    echo "hamqsi_start_broker: run post_online script for ${BROKER}"
+    ${HASCRIPT_DIR}/bin/subscript/rc.mqsi ${BROKER} post_online &
+    # The exit code from online script is deliberately ignored
+  fi
+  echo ""
+  echo "Broker Start ($BROKER) Completed\n"
+  exit 0
+fi
+exit 0

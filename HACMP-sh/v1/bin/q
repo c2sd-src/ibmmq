@@ -1,0 +1,42 @@
+#!/bin/ksh
+#Global Variable
+MQUSER=mqm
+
+QMNAME=EAIBK3P
+
+#MQ, WMQI, DB2 start
+echo "$QMNAME EAI Component Stating(WMQI, MQSeries, DB2 instance)"
+/prod/eai/aheai2/bin/hamqsi_start_broker_as $BKNAME $QMNAME $MQUSER $DB2INST $DBNAME 
+su $MQUSER -c /usr/mqm/bin/strmqcsv $QMNAME
+
+#WMQ start
+echo "[$QMNAME] Queue manager starting"
+/MQHA/bin/hamqm_start $QMNAME
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start WMQ Qmgr"
+  exit $rc
+fi
+
+#MQ Trigger Monitor Start
+#echo "\n[$QMNAME] Trigger Monitor starting"
+#su $MQUSER -c "/MQHA/bin/hamqm_trm $QMNAME start"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+#  echo "(ERROR) ${0}: Could not start WMQ Trigger Monitor"
+#  exit $rc
+#fi
+
+#MTE Control Center Agent start
+echo "\nMTE Control Center Agent Starting."
+su $MQUSER -c "/MQHA/bin/hamteagent_op start"
+rc=$?
+if [ $rc -ne 0 ]
+then
+  echo "(ERROR) ${0}: Could not start MTE Agent"
+  exit $rc
+fi
+
+exit 0

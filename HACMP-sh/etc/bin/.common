@@ -1,0 +1,85 @@
+echo "####################################################"
+echo "#            EAI Solution Operation Tool           #"
+echo "####################################################"
+
+#-----------------------------------------------------------#
+# OS º° Switch user error code Á¤ÀÇ                         #
+#-----------------------------------------------------------#
+su_error_cd=0;
+case `uname -s` in
+ AIX)
+   su_error_cd=113;
+   ;;
+ SunOS)
+   su_error_cd=1;
+   ;;
+ HP-UX)
+   su_error_cd=9;
+   ;;
+esac
+
+SVC_ALERT_TITLE()
+{
+  echo ""
+  echo "[5m<Message>[0m"
+}
+
+#-----------------------------------------------------------#
+# SVC_STATUS()                                              #
+# Desc : Function Call »óÅÂ Ã¼Å©                            #
+#-----------------------------------------------------------#
+SVC_STATUS()
+{
+  while true
+  do
+    skipFlag=$1
+    $2
+    status=$?
+
+    if [ $status -eq 0 ]
+    then
+      break
+    else
+
+      if [ $status -eq $su_error_cd ]
+      then
+        SVC_ALERT_TITLE
+        echo "Cannot switch user : Authentication is denied."
+        echo "Retry user password ?(Y/N)\c"
+        read retry
+        echo ""
+
+        if [ `echo $retry | awk '{print toupper($1)}'` = "Y" ]
+        then
+          continue
+        else
+
+          SVC_ALERT_TITLE
+          if [ $skipFlag -eq 0 ]
+          then
+            echo "[31m(FAIL)[0m ${0} ${2}"
+            echo "[31m(SKIP)[0m ${2}\n"
+            return 0
+          else
+            echo "User requested stop of script(${0})"
+            echo "[31m(FAIL)[0m ${0} ${2}\n"
+            exit -1
+          fi
+        fi
+      else
+
+        SVC_ALERT_TITLE
+        if [ $skipFlag -eq 0 ]
+        then
+          echo "[31m(FAIL)[0m ${0} ${2}"
+          echo "[31m(SKIP)[0m ${2}\n"
+          return 0
+        else
+          echo "[31m(FAIL)[0m ${0} ${2}\n"
+          exit $status
+        fi
+      fi
+    fi
+  done
+  return 0
+}
